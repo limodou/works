@@ -1,0 +1,63 @@
+{{extend "site/home.html"}}
+
+{{block content_wrapper}}
+<link rel="stylesheet" type="text/css" href="{{=url_for_static('site/site.css')}}">
+<style>
+    .card {text-align:center;}
+    .card .card-icon {font-size:400%;}
+</style>
+{{use "ui.vue"}}
+
+<div class="row" id="header-unit">
+    <h1>We Work Together</h1>
+    <p class="sub-title">我们工作在一起, 记录下工作中的点点滴滴...</p>
+</div>
+
+<div class="content-wrapper">
+    <div class="container">
+        {{include "layout/include/inc_1column_content_wrapper.html"}}
+    </div>
+</div>
+
+{{end}}
+
+{{block content}}
+<div class="container" style="height:300px;padding-top:40px;" id="app">
+    <div class="row">
+        <card v-for="card in cards" :card="card"></card>
+    </div>
+</div>
+
+<template id="card-template">
+  <div class="card col-sm-3 col-xs-12">
+    <div class="row">
+      <div class="col-xs-4 col-sm-12">
+        <span class="card-icon"><i class="fa" :class="card.icon"></i></span>
+      </div>
+      <div class="col-xs-8 col-sm-12">
+        <h4 class="card-title">{ card.title }</h4>
+        <p>{ card.desc }</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+    Vue.component('card', {
+        template: '#card-template',
+        props: ['card'],
+        delimiters: ['{', '}']
+    })
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        cards: {{$ settings.SITE.cards}}
+      },
+      delimiters: ['{', '}']
+    })
+</script>
+{{end}}
+
+{{block footer}}
+{{end}}
