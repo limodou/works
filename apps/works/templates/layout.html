@@ -20,15 +20,15 @@
 {{end}}
 
 {{block content}}
-<div class="container" style="height:300px;padding-top:40px;" id="app1">
+<div class="container" style="height:300px;padding-top:40px;" id="app">
     <div class="row">
         <card v-for="card in cards" :card="card"></card>
     </div>
 </div>
 
 <script>
-    var app1 = new Vue({
-      el: '#app1',
+    var app = new Vue({
+      el: '#app',
       data: {
         cards: {{$ settings.SITE.cards}}
       },
@@ -38,12 +38,12 @@
 {{end}}
 
 {{block footer}}
-  <footer class="main-footer" id="app2">
+  <footer class="main-footer">
     <div class="container">
       <div class="row">
-          <Footer-Card v-for="card in footerCards"
-                       :card="card"
-                       :size="12/footerCards.length"></Footer-Card>
+          {{block footer-top}}
+          <footer-cards></footer-cards>
+          {{end}}
       </div>
     </div>
   </footer>
@@ -63,13 +63,8 @@
       </div>
   </div>
 
-  <script>
-    var app2 = new Vue({
-      el: '#app2',
-      data: {
-        footerCards: {{$ settings.SITE.footer_cards}}
-      },
-      delimiters: ['{', '}']
-    })
-  </script>
+<script>
+  riot.mount('cards', {cards:{{<< json_dumps(settings.SITE.cards)}}});
+  riot.mount('footer-cards', {cards:{{<< json_dumps(settings.SITE.footer_cards)}}});
+</script>
 {{end}}
