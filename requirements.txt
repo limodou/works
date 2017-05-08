@@ -1,2 +1,4 @@
 uliweb
-plugs
+uliweb-ui
+uliweb-apps
+uliweb-layout
