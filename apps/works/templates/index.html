@@ -52,11 +52,7 @@
           <div class="row">
               <div class="col-sm-12" id="copyright">
                   {{block footer-bottom}}
-                  <ul>
-                      <li>{{<< settings.LAYOUT.COPYRIGHT or '&copy; 2014 Uliweb Admin'}}</li>
-                      <li>/</li>
-                      <li><a mailto="{{=settings.SITE.mailto}}">{{=settings.SITE.mailto}}</a></li>
-                  </ul>
+                    {{<< settings.LAYOUT.footer }}
                   {{end}}
               </div>
           </div>

@@ -1,0 +1,16 @@
+{{extend "site/layout2.html"}}
+
+{{block sidemenu}}
+{{<< sidemenu('MENU')}}
+{{end}}
+
+{{block content_header_title}}
+  <h1>个人面板</h1>
+{{end}}
+
+{{block content_header_breadcrumb}}
+  <ol class="breadcrumb">
+    <li><a href="/config">首页</a></li>
+    <li>个人面板</li>
+  </ol>
+{{end}}
