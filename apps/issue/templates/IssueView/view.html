@@ -1,0 +1,114 @@
+{{extend "issue_layout.html"}}
+
+{{block content_header_title}}
+  <h1>{{=title}}</h1>
+{{end}}
+
+{{block content_header_breadcrumb}}
+{{<< functions.breadcrumb('MENU', 'issue', prefix='<a href="/">首页</a>')}}
+{{end}}
+
+
+{{block content_main}}
+{{use "ui.vue"}}
+{{use "ui.vue_router"}}
+{{link "works/js/issue.js"}}
+{{link "works/js/comment.js"}}
+{{link "works/css/comment.css"}}
+{{link "works/js/task.js"}}
+
+<style>
+  .issue-content {margin-bottom:20px;}
+  .issue-content img {max-width: 100%;}
+</style>
+
+<div id="app">
+
+  <div class="row">
+    <div class="col-xs-8 issue-content">
+      {{<< content or '无详细内容'}}
+    </div>
+    <div class="col-xs-4">
+      <issue-info :info="info"></issue-info>
+    </div>
+  </div>
+
+  {{if memo:}}
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="alert bg-info" style="padding:20px;border-top:4px solid gray;">
+        <h4>备注</h4>
+        {{<< memo }}
+      </div>
+    </div>
+  </div>
+  {{pass}}
+
+  <div class="tools" style="margin-bottom:20px;border-bottom:1px dotted gray;padding-bottom:10px;">
+    <a href="/issue/add" class="btn btn-primary">增加新需求/问题</a>
+    <a href="/issue/edit/{{=object.content_id}}" class="btn btn-success">编辑</a>
+  </div>
+
+  <div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+      <router-link tag='li' active-class="active"
+                   :to="{name: 'comment', query: {index: index}}">
+        <a data-toggle="tab">评论</a>
+      </router-link>
+      <router-link tag='li' active-class="active"
+                   :to="{name: 'design', query: {index: index}}">
+        <a data-toggle="tab">设计</a>
+      </router-link>
+      <router-link tag='li' active-class="active"
+                   :to="{name: 'task', query: {index: index}}">
+        <a data-toggle="tab">任务</a>
+      </router-link>
+    </ul>
+    <div class="tab-content">
+      <router-view></router-view>
+    </div>
+  </div>
+
+</div>
+<script>
+    var index = {{$ key}}
+    var Comment = { template:'<div>' +
+      '<comment :notitle="true" :index="$route.query.index"></comment>' +
+      '</div>'
+    }
+    var Design = { template: '<div>design</div>' }
+    var Task = { template: '<div>' +
+      '<task :notitle="true" :index="$route.query.index"></task>' +
+      '</div>'
+    }
+
+    var routes = [
+      { path: '/comment', component: Comment, name: 'comment' },
+      { path: '/design', component: Design, name: 'design' },
+      { path: '/task', component: Task, name: 'task' }
+    ]
+
+    var router = new VueRouter({
+      routes
+    })
+
+    var issue = new Vue({
+      el: '#app',
+      router,
+      data: {
+        info: {
+          status: {{$ status}},
+          time: {{$ time}},
+          responsible: {{$ responsible}},
+          page_num: {{$ page_num}},
+          trans_num: {{$ trans_num}}
+        },
+        index: {{$ key}}
+      },
+      mounted: function () {
+        router.push({name: 'comment', query: { index: this.index }})
+      }
+    })
+
+</script>
+{{end}}

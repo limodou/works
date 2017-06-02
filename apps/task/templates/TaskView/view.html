@@ -1,0 +1,34 @@
+{{extend "task_layout.html"}}
+
+{{block content_header_title}}
+  <h1>{{=title}}</h1>
+{{end}}
+
+{{block content_header_breadcrumb}}
+{{<< functions.breadcrumb('MENU', 'task', prefix='<a href="/">首页</a>')}}
+{{end}}
+
+
+{{block content_main}}
+
+{{use 'ui.ckeditor'}}
+
+<div class="box">
+    <div class="box-body">
+        {{<< content}}
+    </div>
+    <div class="box-footer clerfix">
+        <div class="pull-left" style="padding-right:10px;line-height:40px;">
+            <a class="btn btn-primary" href="/task/edit/{{=id}}">编辑</a>
+            <a class="btn btn-success" href="/task/add?index={{=key}}">添加新任务</a>
+        </div>
+        <div class="pull-right" style="line-height:40px;">
+            <span>{{= dis_status }}</span>
+            <span>{{= dis_responsible or '未指派' }}</span>
+            <span>{{= plan_begin_date or '-'}}</span> /
+            <span>{{= plan_finish_date or '-'}}</span>
+        </div>
+    </div>
+</div>
+
+{{end}}

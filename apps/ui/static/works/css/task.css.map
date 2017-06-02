@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///./src/task/Task.vue"],"names":[],"mappings":"AACA,sDACE,qBACA,qBAA2B","file":"css/task.css","sourcesContent":["\n.box-comments .comment-text .comment-text-content img {\n  width: initial !important;\n  height: initial !important;\n}\n\n\n\n// WEBPACK FOOTER //\n// ./src/task/Task.vue"],"sourceRoot":""}

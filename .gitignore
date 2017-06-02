@@ -7,3 +7,5 @@ dist
 _git
 alembic
 sessions
+uploads
+node_modules

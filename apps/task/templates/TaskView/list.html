@@ -1,0 +1,54 @@
+{{extend "task_layout.html"}}
+
+{{block content_main}}
+
+{{include "inc_rgrid.html"}}
+<rgrid id="grid"></rgrid>
+
+<script>
+  var tools = [
+    [
+      {
+        label: '增加',
+        onClick: function() {
+          window.location.href = '/task/add'
+        }
+      },
+      {
+        label:'编辑',
+        checkSelected: true,
+        class: 'btn-info',
+        onClick:function () {
+          var rows = grid.get_selected()
+          window.location.href = '/task/edit/'+rows[0]['id']
+        }
+      },
+      {
+        label:'删除',
+        id:'btnDelete',
+        class: 'btn-danger',
+        checkSelected: true,
+        onClick:function () {
+          var rows = grid.get_selected()
+          Confirm('确认要删除当前记录吗?', function(r){
+            if(r) grid.remove(rows, '/task/delete/'+rows[0]['id'])
+          })
+        }
+      }
+    ]
+  ]
+
+  create_table('grid', {
+    rowHeight:40,
+    tools:tools,
+    indexCol:true,
+    checkCol:true,
+    height:'auto',
+    idField:'content.id',
+    download: true
+  })
+
+  var grid = document.getElementById('grid')
+
+</script>
+{{end}}

@@ -1,0 +1,119 @@
+{{extend "parameter_layout.html"}}
+
+{{block sidemenu}}
+{{<< sidemenu('MENU', 'parameter')}}
+{{end}}
+
+{{block content_header_title}}
+  <h1>参数管理</h1>
+{{end}}
+
+{{block content_header_breadcrumb}}
+  <ol class="breadcrumb">
+    <li><a href="/config">首页</a></li>
+    <li>系统管理</li>
+    <li>参数管理</li>
+  </ol>
+{{end}}
+
+{{block content_main}}
+{{use "ui.vue"}}
+{{#link "works/css/common.css"}}
+{{link "works/js/common.js"}}
+
+{{include "inc_rgrid.html"}}
+
+<div class="row">
+  <div class="col-md-3" id="list_group">
+    <list-group
+            :items="parameters"
+            type="linked"
+            title="参数:"
+            :editable="true"
+            @selected="handleSelected"
+          ></list-group>
+  </div>
+  <div class="col-md-9">
+    <rgrid id="grid"></rgrid>
+  </div>
+</div>
+
+<script>
+  var parameter_id
+  var tools = [
+    [
+      {
+        label: '增加',
+        id: 'btnAdd',
+        onClick: function() {
+          if (!parameter_id) {
+            Alert('请先选择参数')
+            return
+          }
+          var options = {
+            onSuccess: function(dialog, d) {
+              grid.update(d.data)
+            }
+          }
+          dialog('/settings/parameter/add?parameter='+parameter_id, options);
+        }
+      },
+      {
+        label:'编辑',
+        checkSelected: true,
+        class: 'btn-info',
+        onClick:function () {
+          var options = {
+            onSuccess: function(dialog, d) {
+              grid.update(d.data)
+            }
+          }
+          var rows = grid.get_selected()
+          dialog('/settings/parameter/edit/'+rows[0].id, options);
+        }
+      },
+      {
+        label:'删除',
+        id:'btnDelete',
+        class: 'btn-danger',
+        checkSelected: true,
+        onClick:function () {
+          var rows = grid.get_selected()
+          Confirm('确认要删除当前记录吗?', function(r){
+            if(r) grid.remove(rows, '/settings/parameter/delete/'+rows[0].id)
+          })
+        }
+      }
+    ]
+  ]
+
+  create_table('grid', {
+    rowHeight:40,
+    tools:tools,
+    indexCol:true,
+    checkCol:true,
+    height:'auto',
+  })
+
+  var grid = document.getElementById('grid')
+
+  var parameter = new Vue({
+    el: '#list_group',
+    data: {
+      parameters: []
+    },
+    methods: {
+      handleSelected (param_id) {
+        parameter_id = param_id
+        var u = get_url('/settings/parameter?data=1', {parameter:param_id})
+        grid.load(u)
+      }
+    }
+  })
+
+  $.get('/settings/parameter/get_parameters?data=1', function(data){
+    Vue.set(parameter, 'parameters', data.rows)
+  })
+
+</script>
+{{end}}

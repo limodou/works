@@ -1,0 +1,33 @@
+{{extend "task_layout.html"}}
+
+{{block content_header_title}}
+  <h1>修改任务</h1>
+{{end}}
+
+{{block content_main}}
+{{<< form}}
+
+<script>
+  $(function(){
+    var options = {
+      plan_begin_date:{
+        option:{
+          format: 'YYYY-MM-DD'
+        }
+      },
+      content: {
+        render: function(el) {
+          load(['ui.ckeditor'], function(){
+            CKEDITOR.config.extraPlugins = 'uploadimage'
+            CKEDITOR.config.uploadUrl = '/uploadfiles/upload_file?key={{=object.uuid}}'
+            CKEDITOR.config.imageUploadUrl = '/uploadfiles/upload_image?key={{=object.uuid}}'
+            CKEDITOR.replace(el[0])
+          })
+        }
+      }
+    }
+    form_widgets('form', options)
+  })
+</script>
+
+{{end}}
