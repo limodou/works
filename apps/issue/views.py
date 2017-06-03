@@ -34,13 +34,16 @@ class IssueView(functions.MultiView):
              'choices': functions.get_parameter('domain')},
             {'name': 'source', 'type':'select', 'multiple': True, 'label':'来源:',
                 'choices':functions.get_parameter('source')},
+            {'name': 'status', 'type':'select', 'multiple': True, 'label':'状态:',
+                'choices':functions.get_parameter('issue_status')},
             {'name': 'deploy', 'type':'select', 'label':'部署:',
                 'choices':functions.get_parameter('deploy')},
             {'name': 'responsible', 'choices':responsible.get_choices(), 'type':'select', 'label':'责任人'},
         ]
         layout = [
-            ['title', 'domain', 'category'],
-            ['responsible', 'source', 'deploy']
+            ['title', 'domain', 'status'],
+            ['responsible', 'source', 'category'],
+            ['deploy']
         ]
         query = QueryView(fields=fields, layout=layout, form_cls=QueryForm)
         return query
@@ -76,6 +79,8 @@ class IssueView(functions.MultiView):
             condition = (self.D.c.source==c['deploy'])& condition
         if c.get('domain'):
             condition = (self.D.c.domain.in_(c['domain'])) & condition
+        if c.get('status'):
+            condition = (self.D.c.status.in_(c['status'])) & condition
         if c.get('responsible'):
             condition = (self.D.c.responsible==c['responsible']) & condition
 
