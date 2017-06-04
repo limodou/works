@@ -183,7 +183,8 @@ class IssueView(functions.MultiView):
                              category=data['category'],
                              uuid=data['uuid'])
             content.save()
-            data['status'] = '0'
+            data['status'] = request.GET.get('status', '')
+            data['domain'] = request.GET.get('domain', '')
             data['content_id'] = content.id
 
         def post_save(obj, data):
@@ -484,3 +485,52 @@ class IssueView(functions.MultiView):
                 'key': obj.uuid,
                 }
 
+    def _get_status_group(self, condition):
+        return []
+
+    def kanban(self):
+        return {'domains':functions.get_parameter('domain')}
+
+    def _get_card_info(self, row):
+        User = functions.get_model('user')
+
+        card = {}
+
+        card['id'] = row.id
+        card['title'] = row.get_content().title
+        card['user'] = unicode(row.responsible or u'未指派')
+        if row.responsible:
+            card['avater'] = row.responsible.get_image_url()
+        else:
+            card['avater'] = User.get_default_image_url()
+        card['url'] = '/issue/view/{}'.format(row.id)
+        card['status'] = row.status or '01'
+
+        return card
+
+    def get_domain_data(self):
+        """
+        获得某个领域的需求信息
+        """
+        domain = request.GET.get('domain')
+        result = []
+        status = {}
+        for s in functions.get_parameter('issue_status'):
+            status[s[0]] = x = {'name': s[0], 'title': s[1], 'items': []}
+            result.append(x)
+        for row in self.D.get_domain_data(domain=domain).order_by(self.C.c.modified_time.desc()):
+            d = self._get_card_info(row)
+            items = status[d['status']]['items']
+            items.append(d)
+
+        return json({'success':True, 'data':result})
+
+    def change_status(self, issue_id):
+        status = request.GET.get('status')
+
+        obj = self.C.get(issue_id)
+        detail = obj.get_detail()
+        detail.status = status
+        detail.save()
+
+        return json({'success':True})

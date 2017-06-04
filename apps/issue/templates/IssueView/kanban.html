@@ -1,0 +1,77 @@
+{{extend "issue_layout.html" extend "site/layout0.html"}}
+
+{{block content_header_title}}
+  <h1>需求/问题看板</h1>
+{{end}}
+
+{{block content_main}}
+
+{{use "ui.vue"}}
+{{use "ui.vue_router"}}
+{{link "works/css/kanban.css"}}
+{{link "works/js/kanban.js"}}
+{{link "works/js/utils.js"}}
+
+<div id="kanban">
+  <kanban
+          :lists="lists"
+          :list_width="list_width"
+          :height="400"
+          @open="open"
+          @move="move"
+          @add="add"
+  >
+    <div slot="header">
+      <dropdown :items="domains"
+                placeholder="请选择某个领域"
+                @input="change_domain"
+                v-model="domain"
+      ></dropdown>
+      <button v-if="domain"
+              class="btn btn-default"
+              @click="refresh"
+              data-toggle="tooltip"
+              title="刷新"
+      ><i class="fa fa-refresh"></i></button>
+    </div>
+  </kanban>
+</div>
+<script>
+      var kanban = new Vue({
+      el: '#kanban',
+      methods: {
+        //增加新的卡片, list是列的对象，主要用于获得是那个栏位
+        add (status) {
+          window.open('/issue/add?domain='+this.domain+'&status='+status)
+        },
+        //某个卡片移动到另一个list时的事件
+        move (card_id, status) {
+          $.post('/issue/change_status/'+card_id+'?status='+status)
+            .success(function(r){
+
+            })
+        },
+        open (card) {
+          window.open('/issue/view/'+card.id)
+        },
+        change_domain( value ) {
+          var self = this
+          $.get('/issue/get_domain_data?domain='+value).success(function(r){
+            self.lists = r.data
+          })
+        },
+        refresh () {
+          this.change_domain(this.domain)
+        }
+      },
+      data: {
+        domain: '',
+        list_width: 270,
+        domains: {{$ domains}},
+        lists: []
+      }
+    })
+
+</script>
+
+{{end}}

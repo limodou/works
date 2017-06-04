@@ -72,6 +72,11 @@ class ContentDetail(Model):
     created_time = Field(DATETIME, verbose_name='创建时间', auto_now_add=True)
     modified_time = Field(DATETIME, verbose_name='修改时间', auto_now_add=True, auto_now=True)
 
+    def get_content(self):
+        C = functions.get_model('content')
+
+        return C.get(self.content_id)
+
 class ContentDetailArticle(ContentDetail):
     """
     文章类型

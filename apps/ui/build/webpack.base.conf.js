@@ -9,12 +9,13 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    test: './src/test.js',
+    utils: './src/utils.js',
     home: './src/home.js',
     common: './src/common.js',
     issue: './src/issue.js',
     comment: './src/comment.js',
     task: './src/task.js',
+    kanban: './src/kanban.js',
   },
   output: {
     path: config.build.assetsRoot,

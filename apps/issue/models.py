@@ -175,3 +175,14 @@ class ContentDetailIssue(ContentDetail):
     #         'responsible',
     #         'labels'
     #     ]
+
+    @classmethod
+    def get_domain_data(cls, domain, condition=None):
+        from sqlalchemy import and_
+
+        C = functions.get_model('content')
+
+        cond = and_(cls.c.content_id==C.c.id,
+                         cls.c.domain==domain, condition)
+
+        return cls.filter(cond)
