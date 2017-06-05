@@ -1,5 +1,10 @@
 {{extend "site/home.html"}}
 
+{{block mainmenu}}
+{{from uliweb_layout.menu import navigation}}
+{{<< navigation('MAIN_MENU')}}
+{{end}}
+
 {{block content_wrapper}}
 <link rel="stylesheet" type="text/css" href="{{=url_for_static('site/site.css')}}">
 {{use "ui.vue"}}
