@@ -176,6 +176,8 @@ class IssueView(functions.MultiView):
                 return SelectField(u'分类', choices=functions.get_parameter('issue_category'))
             if name == 'uuid':
                 return StringField()
+            if name == 'status':
+                return SelectField(u'状态', choices=functions.get_parameter('issue_status'))
 
         def pre_save(data):
             content = self.C(content_type=self.content_type_obj.id, title=data['title'],
@@ -183,8 +185,6 @@ class IssueView(functions.MultiView):
                              category=data['category'],
                              uuid=data['uuid'])
             content.save()
-            data['status'] = request.GET.get('status', '')
-            data['domain'] = request.GET.get('domain', '')
             data['content_id'] = content.id
 
         def post_save(obj, data):
@@ -197,13 +197,16 @@ class IssueView(functions.MultiView):
             return '/issue/view/{}'.format(obj.content_id)
 
         uuid = get_uuid()
+        data = {'uuid':uuid}
+        data['status'] = request.GET.get('status', '01')
+        data['domain'] = request.GET.get('domain', '')
 
         return self._add('contentdetailissue',
                          pre_save=pre_save,
                          post_save=post_save,
                          hidden_fields=['uuid'],
                          ok_url=get_url,
-                         data={'uuid':uuid},
+                         data=data,
                          template_data={'uuid':uuid},
                          get_form_field=get_form_field,
                          layout_class='bs3t')
@@ -484,9 +487,6 @@ class IssueView(functions.MultiView):
                 'trans_num': detail.trans_num,
                 'key': obj.uuid,
                 }
-
-    def _get_status_group(self, condition):
-        return []
 
     def kanban(self):
         return {'domains':functions.get_parameter('domain')}

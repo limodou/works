@@ -22,7 +22,7 @@ def get_parameter(name):
         para = P.get(P.c.name == name)
         if para:
             items = []
-            for row in PV.filter(PV.c.parameter == para.id):
+            for row in PV.filter(PV.c.parameter == para.id).order_by(PV.c.order):
                 items.append((row.value, row.display))
             return items
         else:

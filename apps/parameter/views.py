@@ -13,7 +13,8 @@ class ParameterView(functions.MultiView):
         condition = self.PV.c.parameter==parameter
 
         return self._list(self.PV,
-                          condition=condition)
+                          condition=condition,
+                          order_by=self.PV.c.order)
 
     def add(self):
         """

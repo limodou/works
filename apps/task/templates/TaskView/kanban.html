@@ -1,0 +1,82 @@
+{{extend "task_layout.html" extend "site/layout0.html"}}
+
+{{block content_header_title}}
+  <h1>任务看板</h1>
+{{end}}
+
+{{block content_main}}
+
+{{use "ui.vue"}}
+{{use "ui.vue_router"}}
+{{link "works/css/kanban.css"}}
+{{link "works/js/kanban.js"}}
+{{link "works/js/utils.js"}}
+
+<div id="kanban">
+  <kanban
+          :lists="lists"
+          :list_width="list_width"
+          :height="400"
+          @open="open"
+          @move="move"
+          @add="add"
+  >
+    <div slot="header">
+      <dropdown :items="responsibles"
+                placeholder="请选择责任人"
+                @input="change_responsible"
+                v-model="responsible"
+                :max-height="300"
+      ></dropdown>
+      <button v-if="responsible"
+              class="btn btn-default"
+              @click="refresh"
+              data-toggle="tooltip"
+              title="刷新"
+      ><i class="fa fa-refresh"></i></button>
+    </div>
+  </kanban>
+</div>
+<script>
+      var kanban = new Vue({
+      el: '#kanban',
+      methods: {
+        //增加新的卡片, list是列的对象，主要用于获得是那个栏位
+        add (status) {
+          window.open('/task/add?user_id='+this.responsible+'&status='+status)
+        },
+        //某个卡片移动到另一个list时的事件
+        move (card_id, status) {
+          $.post('/task/change_status/'+card_id+'?status='+status)
+            .success(function(r){
+
+            })
+        },
+        open (card) {
+          window.open('/task/view/'+card.id)
+        },
+        change_responsible( value ) {
+          var self = this
+          $.get('/task/get_user_data?user_id='+value).success(function(r){
+            self.lists = r.data
+          })
+        },
+        refresh () {
+          this.change_domain(this.domain)
+        }
+      },
+      data: {
+        responsible: '',
+        list_width: 270,
+        responsibles: {{$ responsibles}},
+        lists: []
+      },
+      mounted () {
+        this.change_responsible('')
+      }
+
+    })
+
+</script>
+
+{{end}}

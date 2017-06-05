@@ -104,13 +104,15 @@ class ContentDetailIssue(ContentDetail):
             'content',
             'memo',
             'uuid',
+            'status',
         ]
 
         layout = [
             'title',
             'content',
             'memo',
-            ['plan_begin_date', 'plan_finish_date', 'percent'],
+            ['status', 'percent'],
+            ['plan_begin_date', 'plan_finish_date'],
             'version_date',
             'responsible',
             ['page_num', 'trans_num'],

@@ -35,7 +35,18 @@
           })
         }
       }
+    ],
+    [
+      {
+        label:'看板视图',
+        id:'btnKanban',
+        class: 'btn-info',
+        onClick:function () {
+          window.location.href = '/task/kanban'
+        }
+      }
     ]
+
   ]
 
   create_table('grid', {

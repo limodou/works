@@ -5,7 +5,7 @@
         {{ current_title }}
         <span class="caret"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" :style="{maxHeight:maxHeight+'px', 'overflow-y':'auto'}">
         <li v-for="item in items"><a href="#" @click.prevent="select(item)">{{item[1]}}</a></li>
       </ul>
     </div>
@@ -32,12 +32,16 @@ export default {
       type: Array
     },
     value: {
-      type: String,
+      type: [String, Number],
       default: ''
     },
     placeholder: {
       type: String,
       default: '请选择...'
+    },
+    maxHeight: {
+      type: Number,
+      default: 300
     }
   },
   computed: {

@@ -9,7 +9,7 @@ class Task(Model):
     """
     key = Field(str, max_length=200, index=True)
     uuid = Field(str, max_length=32)
-    title = Field(str, max_length=256, verbose_name='标题')
+    title = Field(str, max_length=256, verbose_name='标题', required=True)
     content = Field(TEXT, verbose_name='内容')
     creator = Reference('user', verbose_name='提出人', index=True)
     responsible = Reference('user', verbose_name='责任人', index=True)
@@ -56,6 +56,7 @@ class Task(Model):
             'plan_finish_date',
             'priority',
             'uuid',
+            'status',
         ]
         layout = [
             'title',
@@ -64,6 +65,7 @@ class Task(Model):
             ['plan_begin_date', 'plan_finish_date'],
             'priority',
             # 'uuid',
+            'status',
         ]
 
     class EditForm:

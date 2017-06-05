@@ -119,8 +119,8 @@ export default {
     open (card) {
       this.$emit('open', card)
     },
-    add (list_name) {
-      this.$emit('add', list_name)
+    add (list) {
+      this.$emit('add', list.name)
     },
     move (card_id, list_name) {
       this.$emit('move', card_id, list_name)

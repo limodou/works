@@ -97,11 +97,17 @@ class TaskView(functions.MultiView):
             return '/task/view/{}'.format(obj.id)
 
         uuid = get_uuid()
+        data = {'uuid': uuid}
+        user_id = request.GET.get('user_id')
+        if user_id:
+            data['responsible'] = user_id
+        status = request.GET.get('status')
+        data['status'] = status
 
         return self._add(self.T,
                          hidden_fields=['uuid'],
                          ok_url=get_url,
-                         data={'uuid': uuid},
+                         data=data,
                          template_data={'uuid':uuid},
                          success_data=success_data,
                          pre_save=pre_save,
@@ -141,3 +147,53 @@ class TaskView(functions.MultiView):
 
         return json({'success': True, 'data': self._get_task(obj)})
 
+    def kanban(self):
+        User = functions.get_model('user')
+
+        return {'responsibles':User.get_choices()}
+
+    def _get_card_info(self, row):
+        User = functions.get_model('user')
+
+        card = {}
+
+        card['id'] = row.id
+        card['title'] = row.title
+        card['user'] = unicode(row.responsible or u'未指派')
+        if row.responsible:
+            card['avater'] = row.responsible.get_image_url()
+        else:
+            card['avater'] = User.get_default_image_url()
+        card['url'] = '/task/view/{}'.format(row.id)
+        card['status'] = row.status or 'ready'
+
+        return card
+
+    def get_user_data(self):
+        """
+        获得某个用户的任务信息
+        """
+        user_id = request.GET.get('user_id')
+        result = []
+        status = {}
+        for s in functions.get_parameter('task_status'):
+            status[s[0]] = x = {'name': s[0], 'title': s[1], 'items': []}
+            result.append(x)
+        condition = None
+        if user_id:
+            condition = (self.T.c.responsible==user_id) & condition
+        for row in self.T.filter(condition).order_by(self.T.c.modified_time.desc()):
+            d = self._get_card_info(row)
+            items = status[d['status']]['items']
+            items.append(d)
+
+        return json({'success':True, 'data':result})
+
+    def change_status(self, issue_id):
+        status = request.GET.get('status')
+
+        obj = self.T.get(issue_id)
+        obj.status = status
+        obj.save()
+
+        return json({'success':True})
