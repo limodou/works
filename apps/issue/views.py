@@ -17,12 +17,17 @@ class IssueView(functions.MultiView):
         self.D = functions.get_model(self.content_type_obj.model_name) #明细表
         self.E = functions.get_model('contentextend') #扩展表
 
+        M = functions.get_model('milestone')
+        self.milestone = M.get_milestone()
+
+
     def _get_query_view(self):
         from uliweb_layout.form.query_view import QueryView
         from uliweb.utils.generic import ReferenceSelectField
 
         QueryForm = functions.get_form('QueryForm')
         User = functions.get_model('user')
+        M = functions.get_model('milestone')
 
         responsible = ReferenceSelectField('user', query=User.all().order_by(User.c.username.asc()))
 
@@ -38,12 +43,17 @@ class IssueView(functions.MultiView):
                 'choices':functions.get_parameter('issue_status')},
             {'name': 'deploy', 'type':'select', 'label':'部署:',
                 'choices':functions.get_parameter('deploy')},
+            {'name': 'milestone', 'type':'select', 'label':'里程碑:',
+                'choices':self.milestone},
             {'name': 'responsible', 'choices':responsible.get_choices(), 'type':'select', 'label':'责任人'},
+            {'name': 'submitter', 'type':'str', 'label':'提出人'},
+            {'name': 'submitted_date', 'type':'date', 'range':True, 'label':'提出时间'},
         ]
         layout = [
             ['title', 'domain', 'status'],
+            ['submitter', 'submitted_date'],
             ['responsible', 'source', 'category'],
-            ['deploy']
+            ['deploy', 'milestone']
         ]
         query = QueryView(fields=fields, layout=layout, form_cls=QueryForm)
         return query
@@ -76,13 +86,15 @@ class IssueView(functions.MultiView):
         if c.get('source'):
             condition = (self.D.c.source==c['source'])& condition
         if c.get('deploy'):
-            condition = (self.D.c.source==c['deploy'])& condition
+            condition = (self.D.c.deploy==c['deploy'])& condition
         if c.get('domain'):
             condition = (self.D.c.domain.in_(c['domain'])) & condition
         if c.get('status'):
             condition = (self.D.c.status.in_(c['status'])) & condition
         if c.get('responsible'):
             condition = (self.D.c.responsible==c['responsible']) & condition
+        if c.get('milestone'):
+            condition = (self.D.c.milestone==c['milestone']) & condition
 
         def content_title(value, obj):
             return u'<a href="/issue/view/{}" target="_blank">{}</a>'.format(obj['content.id'],
@@ -166,6 +178,8 @@ class IssueView(functions.MultiView):
         def get_form_field(name):
             from uliweb.form import TextField, StringField, SelectField
 
+            Milestone = functions.get_model('milestone')
+
             if name == 'content':
                 return TextField(u'内容')
             if name == 'memo':
@@ -178,6 +192,10 @@ class IssueView(functions.MultiView):
                 return StringField()
             if name == 'status':
                 return SelectField(u'状态', choices=functions.get_parameter('issue_status'))
+            if name == 'deploy':
+                return SelectField(u'部署', choices=functions.get_parameter('deploy'))
+            if name == 'milestone':
+                return SelectField(u'里程碑', choices=self.milestone)
 
         def pre_save(data):
             content = self.C(content_type=self.content_type_obj.id, title=data['title'],
@@ -189,7 +207,7 @@ class IssueView(functions.MultiView):
 
         def post_save(obj, data):
             extend = self.E(content_id=obj.content_id,
-                            memo=data[memo],
+                            memo=data['memo'],
                             content=data['content'])
             extend.save()
 
@@ -224,6 +242,8 @@ class IssueView(functions.MultiView):
         def get_form_field(name, obj):
             from uliweb.form import TextField, StringField, SelectField
 
+            Milestone = functions.get_model('milestone')
+
             if name == 'content':
                 return TextField(u'内容')
             if name == 'memo':
@@ -232,6 +252,12 @@ class IssueView(functions.MultiView):
                 return StringField(u'标题', required=True)
             if name == 'category':
                 return SelectField(u'分类', choices=functions.get_parameter('issue_category'))
+            if name == 'status':
+                return SelectField(u'状态', choices=functions.get_parameter('issue_status'))
+            if name == 'deploy':
+                return SelectField(u'部署', choices=functions.get_parameter('deploy'))
+            if name == 'milestone':
+                return SelectField(u'里程碑', choices=self.milestone)
 
 
         def post_save(obj, data):
@@ -281,15 +307,7 @@ class IssueView(functions.MultiView):
             return True, list(u)[0].id
 
     _validate_responsible = _validate_creator
-
-    def _validate_version_date(self, value):
-        from uliweb.utils import date
-
-        try:
-            new_value = date.to_date(value)
-            return True, new_value
-        except:
-            return False, '转换{}日期格式失败'.format(value)
+    _validate_submitter = _validate_creator
 
     def _validate_priority(self, value):
         if not value:
@@ -299,7 +317,6 @@ class IssueView(functions.MultiView):
             if display == value:
                 return True, key
         return False, u'优先级不正确, 应该是 {}'.format(','.join([x[1] for x in values]))
-
 
     def _validate_domain(self, value):
         if not value:
@@ -371,7 +388,16 @@ class IssueView(functions.MultiView):
             return False, '日期格式不正确，需要为 "yyyy/mm/dd" 或 "yyyy-mm-dd"'
 
     _validate_plan_finish_date = _validate_plan_begin_date
-    _validate_version_date = _validate_plan_begin_date
+    _validate_submitted_date = _validate_plan_begin_date
+
+    def _validate_milestone(self, value):
+        if not value:
+            return True, ''
+
+        for key, display in self.milestone:
+            if display == value:
+                return True, key
+        return False, u'里程碑不正确，应该是 {}'.format(','.join([x[1] for x in values]))
 
     def _validate_trans_num(self, value):
         if not value:
@@ -453,7 +479,7 @@ class IssueView(functions.MultiView):
 
 
     def view(self, id):
-        from uliweb.utils.textconvert import text2html
+        from uliweb.utils.timesince import timesince
 
         obj = self.C.get(int(id))
         detail = obj.get_detail()
@@ -486,6 +512,9 @@ class IssueView(functions.MultiView):
                 'page_num': detail.page_num,
                 'trans_num': detail.trans_num,
                 'key': obj.uuid,
+                'creator': unicode(obj.creator),
+                'created_time': timesince(obj.created_time),
+                'milestone': unicode(detail.milestone),
                 }
 
     def kanban(self):

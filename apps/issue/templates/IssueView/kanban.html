@@ -41,26 +41,26 @@
       el: '#kanban',
       methods: {
         //增加新的卡片, list是列的对象，主要用于获得是那个栏位
-        add (status) {
+        add : function (status) {
           window.open('/issue/add?domain='+this.domain+'&status='+status)
         },
         //某个卡片移动到另一个list时的事件
-        move (card_id, status) {
+        move: function (card_id, status) {
           $.post('/issue/change_status/'+card_id+'?status='+status)
             .success(function(r){
 
             })
         },
-        open (card) {
+        open: function (card) {
           window.open('/issue/view/'+card.id)
         },
-        change_domain( value ) {
+        change_domain: function( value ) {
           var self = this
           $.get('/issue/get_domain_data?domain='+value).success(function(r){
             self.lists = r.data
           })
         },
-        refresh () {
+        refresh: function () {
           this.change_domain(this.domain)
         }
       },
@@ -69,7 +69,11 @@
         list_width: 270,
         domains: {{$ domains}},
         lists: []
+      },
+      mounted: function () {
+        this.change_domain('')
       }
+
     })
 
 </script>

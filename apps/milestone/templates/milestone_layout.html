@@ -1,0 +1,13 @@
+{{extend "site/layout2.html"}}
+
+{{block sidemenu}}
+{{<< sidemenu('MENU', 'milestone')}}
+{{end}}
+
+{{block content_header_title}}
+  <h1>里程碑</h1>
+{{end}}
+
+{{block content_header_breadcrumb}}
+{{<< functions.breadcrumb('MENU', 'milestone', prefix='<a href="/">首页</a>')}}
+{{end}}

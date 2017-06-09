@@ -12,6 +12,10 @@
     <div class="box-body">
       <ul class="nav nav-pills nav-stacked">
         <li>
+          <a href="#">里程碑
+            <span class="pull-right">{{info.milestone}}</span></a>
+        </li>
+        <li>
           <a href="#">责任人
             <span class="pull-right">{{info.responsible}}</span></a>
         </li>

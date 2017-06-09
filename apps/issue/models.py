@@ -23,6 +23,7 @@ class ContentDetailIssue(ContentDetail):
     plan_begin_date = Field(DATE, verbose_name='开始时间')
     plan_finish_date = Field(DATE, verbose_name='结束时间')
     version_date = Field(DATE, verbose_name='上线时间', index=True)
+    milestone = Reference('milestone', verbose_name='里程碑')
     percent = Field(int, verbose_name='完成%')
     priority = Field(str, max_length=10,
                          choices=functions.parameter_choices('issue_priority'),
@@ -32,11 +33,14 @@ class ContentDetailIssue(ContentDetail):
                        verbose_name='状态')
     page_num = Field(int, verbose_name='页面数')
     trans_num = Field(int, verbose_name='交易数')
+    task_num = Field(int, verbose_name='任务数')
+    submitter = Field(str, max_length=80, verbose_name='提出人')
+    submitted_date = Field(DATE, verbose_name='提出时间')
 
     class Table:
         fields = [
             {'name':'content.id', 'title':'ID', 'width':40, 'align':'center'},
-            {'name':'contentdetailissue.domain', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.domain', 'align':'center', 'width':120},
             {'name':'content.category', 'align':'center', 'width':80},
             # {'name':'content.group', 'hidden':True},
             #{'name':'content.content_type'},
@@ -49,7 +53,9 @@ class ContentDetailIssue(ContentDetail):
             {'name':'contentdetailissue.trans_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.plan_begin_date', 'align':'center', 'width':100},
             {'name':'contentdetailissue.plan_finish_date', 'align':'center', 'width':100},
-            {'name':'contentdetailissue.status', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.status', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.submitter', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.submitted_date', 'align':'center', 'width':100, 'sortable':True},
             {'name':'contentdetailissue.percent', 'align':'center', 'width':80},
             # {'name':'content.memo', 'width':80},
             {'name':'content.labels', 'hidden':True},
@@ -57,7 +63,7 @@ class ContentDetailIssue(ContentDetail):
             {'name':'content.hits', 'hidden':True},
             {'name':'content.created_time', 'hidden':True},
             #{'name':'content.modified_time'},
-            {'name':'contentdetailissue.version_date', 'align':'center', 'width':100},
+            {'name':'contentdetailissue.milestone', 'align':'center', 'width':90},
         ]
 
     class Batch:
@@ -78,6 +84,8 @@ class ContentDetailIssue(ContentDetail):
             {'name':'contentdetailissue.plan_begin_date'},
             {'name':'contentdetailissue.plan_finish_date'},
             {'name':'contentdetailissue.status', 'editor':'select', 'selectOptions':get_source('issue_status')},
+            {'name':'contentdetailissue.submitter'},
+            {'name':'contentdetailissue.submitted_date'},
             {'name':'contentdetailissue.percent'},
             {'name':'contentextend.memo', 'width':80},
             {'name':'content.labels', 'hidden':True},
@@ -85,7 +93,7 @@ class ContentDetailIssue(ContentDetail):
             {'name':'content.hits', 'hidden':True},
             {'name':'content.created_time', 'hidden':True},
             #{'name':'content.modified_time'},
-            {'name':'contentdetailissue.version_date'},
+            {'name':'contentdetailissue.milestone'},
             {'name':'contentextend.content'},
         ]
 
@@ -95,7 +103,7 @@ class ContentDetailIssue(ContentDetail):
             'domain',
             'source',
             'title', 'priority',
-            'version_date',
+            'milestone',
             'plan_begin_date', 'plan_finish_date',
             'percent',
             'responsible',
@@ -105,21 +113,26 @@ class ContentDetailIssue(ContentDetail):
             'memo',
             'uuid',
             'status',
+            'deploy',
+            'submitter',
+            'submitted_date',
         ]
 
         layout = [
+            '-- 基本信息 --',
             'title',
             'content',
+            ['submitter', 'submitted_date'],
             'memo',
-            ['status', 'percent'],
-            ['plan_begin_date', 'plan_finish_date'],
-            'version_date',
+            '-- 分类信息 --',
+            ['domain', 'category'],
+            ['source', 'priority'],
+            ['deploy', 'milestone'],
+            '-- 处理状态 --',
             'responsible',
+            ['plan_begin_date', 'plan_finish_date'],
+            ['status', 'percent'],
             ['page_num', 'trans_num'],
-            'category',
-            'domain',
-            'source',
-            'priority',
         ]
 
     class EditForm:
@@ -128,7 +141,7 @@ class ContentDetailIssue(ContentDetail):
             'domain',
             'source',
             'title', 'priority',
-            'version_date',
+            'milestone',
             'plan_begin_date', 'plan_finish_date',
             'percent',
             'responsible',
@@ -137,21 +150,26 @@ class ContentDetailIssue(ContentDetail):
             'content',
             'memo',
             'status',
+            'deploy',
+            'submitter',
+            'submitted_date',
         ]
 
         layout = [
+            '-- 基本信息 --',
             'title',
             'content',
+            ['submitter', 'submitted_date'],
             'memo',
-            ['status', 'percent'],
-            ['plan_begin_date', 'plan_finish_date'],
-            'version_date',
+            '-- 分类信息 --',
+            ['domain', 'category'],
+            ['source', 'priority'],
+            ['deploy', 'milestone'],
+            '-- 处理状态 --',
             'responsible',
+            ['plan_begin_date', 'plan_finish_date'],
+            ['status', 'percent'],
             ['page_num', 'trans_num'],
-            'category',
-            'domain',
-            'source',
-            'priority',
         ]
 
     # class DetailView:
@@ -184,7 +202,8 @@ class ContentDetailIssue(ContentDetail):
 
         C = functions.get_model('content')
 
-        cond = and_(cls.c.content_id==C.c.id,
-                         cls.c.domain==domain, condition)
+        cond = and_(cls.c.content_id==C.c.id, condition)
+        if domain:
+            cond = (cls.c.domain==domain) & cond
 
         return cls.filter(cond)

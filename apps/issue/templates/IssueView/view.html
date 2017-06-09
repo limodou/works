@@ -20,12 +20,16 @@
 <style>
   .issue-content {margin-bottom:20px;}
   .issue-content img {max-width: 100%;}
+  .creator {font-size: 12px; color:gray;margin-bottom:20px;}
 </style>
 
 <div id="app">
 
   <div class="row">
     <div class="col-xs-8 issue-content">
+      <div class="creator">
+        {{= creator}} 在 {{=created_time}}
+      </div>
       {{<< content or '无详细内容'}}
     </div>
     <div class="col-xs-4">
@@ -52,15 +56,15 @@
   <div class="nav-tabs-custom">
     <ul class="nav nav-tabs">
       <router-link tag='li' active-class="active"
-                   :to="{name: 'comment', query: {index: index}}">
+                   :to="{name: 'comment', query: {index: index} }">
         <a data-toggle="tab">评论</a>
       </router-link>
       <router-link tag='li' active-class="active"
-                   :to="{name: 'design', query: {index: index}}">
+                   :to="{name: 'design', query: {index: index} }">
         <a data-toggle="tab">设计</a>
       </router-link>
       <router-link tag='li' active-class="active"
-                   :to="{name: 'task', query: {index: index}}">
+                   :to="{name: 'task', query: {index: index} }">
         <a data-toggle="tab">任务</a>
       </router-link>
     </ul>
@@ -89,19 +93,20 @@
     ]
 
     var router = new VueRouter({
-      routes
+      routes: routes
     })
 
     var issue = new Vue({
       el: '#app',
-      router,
+      router: router,
       data: {
         info: {
           status: {{$ status}},
           time: {{$ time}},
           responsible: {{$ responsible}},
           page_num: {{$ page_num}},
-          trans_num: {{$ trans_num}}
+          trans_num: {{$ trans_num}},
+          milestone: {{$ milestone}}
         },
         index: {{$ key}}
       },

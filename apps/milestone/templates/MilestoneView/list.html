@@ -1,4 +1,4 @@
-{{extend "issue_layout.html"}}
+{{extend "milestone_layout.html"}}
 
 {{block content_main}}
 
@@ -11,15 +11,12 @@
       {
         label: '增加',
         onClick: function() {
-          /*var options = {
+          var options = {
             onSuccess: function(dialog, d) {
               grid.update(d.data)
-              window.location.href = '/issue/view/'+d.data['content.id']
             }
           }
-          dialog('/issue/add', options);
-          */
-          window.location.href = '/issue/add'
+          dialog('/settings/milestone/add', options);
         }
       },
       {
@@ -27,16 +24,13 @@
         checkSelected: true,
         class: 'btn-info',
         onClick:function () {
-          /* var options = {
+          var options = {
             onSuccess: function(dialog, d) {
               grid.update(d.data)
             }
           }
           var rows = grid.get_selected()
-          dialog('/issue/edit/'+rows[0]['content.id'], options);
-          */
-          var rows = grid.get_selected()
-          window.location.href = '/issue/edit/'+rows[0]['content.id']
+          dialog('/settings/milestone/edit/'+rows[0]['id'], options);
         }
       },
       {
@@ -47,42 +41,20 @@
         onClick:function () {
           var rows = grid.get_selected()
           Confirm('确认要删除当前记录吗?', function(r){
-            if(r) grid.remove(rows, '/issue/delete/'+rows[0]['content.id'])
+            if(r) grid.remove(rows, '/settings/milestone/delete/'+rows[0]['id'])
           })
         }
       }
-    ],
-    [
-      {
-        label:'批量导入',
-        id:'btnBatch',
-        class: 'btn-info',
-        onClick:function () {
-          window.location.href = '/issue/batch'
-        }
-      }
-    ],
-    [
-      {
-        label:'看板视图',
-        id:'btnKanban',
-        class: 'btn-info',
-        onClick:function () {
-          window.location.href = '/issue/kanban'
-        }
-      }
     ]
-
   ]
 
   create_table('grid', {
+    rowHeight:40,
     tools:tools,
     indexCol:true,
     checkCol:true,
     height:'auto',
-    idField:'content.id',
-    download: true,
-    remoteSort: true
+    theme: 'table-striped'
   })
 
   var grid = document.getElementById('grid')
