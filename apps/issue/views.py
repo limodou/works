@@ -82,9 +82,9 @@ class IssueView(functions.MultiView):
         if c.get('title'):
             condition = self.C.c.title.like('%'+c['title']+'%')& condition
         if c.get('category'):
-            condition = (self.C.c.category==c['category'])& condition
+            condition = (self.C.c.category.in_(c['category']))& condition
         if c.get('source'):
-            condition = (self.D.c.source==c['source'])& condition
+            condition = (self.D.c.source.in_(c['source']))& condition
         if c.get('deploy'):
             condition = (self.D.c.deploy==c['deploy'])& condition
         if c.get('domain'):

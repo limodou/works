@@ -6,6 +6,7 @@ from uliweb import functions
 def call(args, options, global_options):
     from uliweb.utils.sorteddict import SortedDict
 
+    C = functions.get_model('content')
     D = functions.get_model('contentdetailissue')
 
     status = functions.get_parameter('issue_status')
@@ -17,7 +18,7 @@ def call(args, options, global_options):
             m[(d[0], s[0])] = 0
 
     condition = D.c.status.in_(['01', '03', '05'])
-    for row in D.filter(None):
+    for row in D.filter(C.c.deleted==False, D.c.content_id==C.c.id, D.c.milestone==1):
         key = row.domain, row.status
         if not row.status:
             print 'No status found for id={}'.format(row.id)

@@ -72,10 +72,10 @@
 
 <script>
   function _sort_by_modified_time(a, b) {
-    return new Date(a) - new Date(b)
+    return new Date(a.modified_time.substr(0, 10)) - new Date(b.modified_time.substr(0, 10))
   }
   function _get_date(a) {
-    var d = new Date(a)
+    var d = new Date(a.substr(0, 10))
     return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
   }
   function _sort_by_group(tasks) {
