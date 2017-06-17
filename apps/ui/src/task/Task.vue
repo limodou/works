@@ -11,7 +11,7 @@
     </div>
     <!-- /.box-header -->
     <div class="box-body" style="background-color:#f7f7f7">
-      <template v-if="count>0" v-for="task in sorted_tasks">
+      <template v-if="tasks.length>0" v-for="task in sorted_tasks">
         <ul class="timeline">
           <!-- timeline time label -->
 
@@ -47,7 +47,7 @@
           <!-- END timeline item -->
         </ul>
       </template>
-      <template v-if="count==0">
+      <template v-if="tasks.length==0">
         暂无任务
       </template>
     </div>
@@ -71,29 +71,19 @@
 </style>
 
 <script>
+
+  import list from '../utils/list'
+
   function _sort_by_modified_time(a, b) {
     return new Date(a.modified_time.substr(0, 10)) - new Date(b.modified_time.substr(0, 10))
   }
   function _get_date(a) {
-    var d = new Date(a.substr(0, 10))
+    let d = new Date(a.substr(0, 10))
     return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
   }
   function _sort_by_group(tasks) {
-    var groups = {}, items
-    var last, item, i, _len,
-        key, //标记比较用的键值
-        result = []
-
-    for(i=0, _len=tasks.length; i<_len; i++) {
-        item = tasks[i]
-        key = _get_date(item['modified_time'])
-        if (last===undefined || last!=key) {
-            items = groups[key] = []
-            last = key
-            result.push({label:key, items:items})
-        } else items = groups[key]
-        items.push(item)
-    }
+    let new_tasks = list.sort(tasks, '-modified_time')
+    let result = list.group(new_tasks, x=>_get_date(x['modified_time']))
 
     return result
   }
@@ -107,39 +97,37 @@
 
 
 export default {
-  name: 'task',
   data () {
     return {
-      count: 0,
-      origin_tasks: [],
       tasks: []
     }
   },
   computed: {
     count_title () {
-      return this.count + ' 条任务'
+      return `${this.tasks.length} 条任务`
     },
     sorted_tasks () {
       return _sort_by_group(this.tasks)
     }
   },
+
   props: ['index', 'notitle'],
+
   mounted () {
     this.load()
   },
+
   methods: {
     load () {
-      var self = this
-      $.get('/task/get?index='+this.index).success(function(r){
+      $.get('/task/get?index='+this.index).success(r=>{
         if (r.success) {
-          self.tasks = r.tasks.sort(_sort_by_modified_time)
-          self.count = r.tasks.length
+          this.tasks = r.tasks
         }
       })
     },
 
     item_icon (item) {
-      return 'fa ' + map[item.status][0]
+      return `fa ${map[item.status][0]}`
     },
 
     item_title (item) {
@@ -147,18 +135,10 @@ export default {
     },
 
     change (item, status) {
-      var self = this
-      var x
-      $.post('/task/change/'+item.id, {status:status}).success(function(r){
+      let x
+      $.post(`/task/change/${item.id}`, {status}).success(r=>{
         if(r.success) {
-          for(var i=0, _len=self.tasks.length; i<_len; i++) {
-            x = self.tasks[i]
-            if (x.id == item.id) {
-              self.tasks.splice(i, 1, r.data)
-              self.tasks = self.tasks.sort(_sort_by_modified_time)
-              return
-            }
-          }
+          list.update(this.tasks, r.data)
         }
       })
     }

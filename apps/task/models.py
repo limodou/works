@@ -38,6 +38,7 @@ class Task(Model):
 
     class Table:
         fields = [
+            {'name':'id', 'verbose_name':'ID', 'width':40, 'align':'center'},
             'title',
             {'name': 'responsible', 'width': 80, 'align': 'center'},
             {'name': 'priority', 'width': 60, 'align': 'center'},

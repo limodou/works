@@ -32,7 +32,7 @@ class IssueView(functions.MultiView):
         responsible = ReferenceSelectField('user', query=User.all().order_by(User.c.username.asc()))
 
         fields = [
-            {'name': 'title', 'type':'str', 'label':'标题:'},
+            {'name': 'title', 'type':'str', 'label':'标题/ID:'},
             {'name': 'category', 'type':'select', 'multiple': True, 'label':'分类:',
                 'choices':functions.get_parameter('issue_category')},
             {'name': 'domain', 'type': 'select', 'multiple': True, 'label': '领域:',
@@ -80,13 +80,13 @@ class IssueView(functions.MultiView):
         condition = None
 
         if c.get('title'):
-            condition = self.C.c.title.like('%'+c['title']+'%')& condition
+            condition = (self.C.c.id.like(c['title']) | self.C.c.title.like('%'+c['title']+'%')) & condition
         if c.get('category'):
-            condition = (self.C.c.category.in_(c['category']))& condition
+            condition = (self.C.c.category.in_(c['category'])) & condition
         if c.get('source'):
-            condition = (self.D.c.source.in_(c['source']))& condition
+            condition = (self.D.c.source.in_(c['source'])) & condition
         if c.get('deploy'):
-            condition = (self.D.c.deploy==c['deploy'])& condition
+            condition = (self.D.c.deploy==c['deploy']) & condition
         if c.get('domain'):
             condition = (self.D.c.domain.in_(c['domain'])) & condition
         if c.get('status'):
@@ -515,6 +515,7 @@ class IssueView(functions.MultiView):
                 'creator': unicode(obj.creator),
                 'created_time': timesince(obj.created_time),
                 'milestone': unicode(detail.milestone),
+                'submitter': unicode(detail.submitter),
                 }
 
     def kanban(self):

@@ -190,10 +190,21 @@ class TaskView(functions.MultiView):
         return json({'success':True, 'data':result})
 
     def change_status(self, issue_id):
+        from uliweb.utils import date
+
         status = request.GET.get('status')
 
         obj = self.T.get(issue_id)
         obj.status = status
+
+        now = date.now()
+        if status == 'start':
+            if not obj.plan_begin_date:
+                obj.plan_begin_date = now
+        if status == 'finish':
+            if not obj.plan_end_date:
+                obj.plan_end_date = now
+            obj.finish_date = now
         obj.save()
 
         return json({'success':True})
