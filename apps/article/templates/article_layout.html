@@ -1,0 +1,13 @@
+{{extend "site/layout2.html"}}
+
+{{block sidemenu}}
+{{<< sidemenu('MENU', 'article')}}
+{{end}}
+
+{{block content_header_title}}
+  <h1>文章</h1>
+{{end}}
+
+{{block content_header_breadcrumb}}
+{{<< functions.breadcrumb('MENU', 'article', prefix='<a href="/">首页</a>')}}
+{{end}}

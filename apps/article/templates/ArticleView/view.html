@@ -1,0 +1,36 @@
+{{extend "article_layout.html"}}
+
+{{block content_header}}
+{{end}}
+
+{{block content_main}}
+{{use "ui.vue"}}
+{{link "works/css/article.css"}}
+{{link "works/js/article.js"}}
+{{link "works/js/comment.js"}}
+{{link "works/css/comment.css"}}
+
+<div id="app">
+  <article-content :info="info"></article-content>
+
+  <comment :index="index"></comment>
+
+</div>
+<script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        index: {{$ uuid}},
+        info: {
+          title: {{$ title}},
+          creator: {{$ creator}},
+          created_time: {{$ created_time}},
+          content: {{$ content}},
+          content_id: {{$ object.content_id}},
+          deletable: {{$ content_obj._creator_ == request.user.id}}
+        }
+      }
+    })
+
+</script>
+{{end}}

@@ -77,12 +77,6 @@ class ContentDetail(Model):
 
         return C.get(self.content_id)
 
-class ContentDetailArticle(ContentDetail):
-    """
-    文章类型
-    """
-    pass
-
 class ContentExtend(Model):
     """
     存放内容的扩展内容

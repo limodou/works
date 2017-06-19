@@ -1,0 +1,27 @@
+{{extend "article_layout.html"}}
+
+{{block content_header_title}}
+  <h1>编辑文章</h1>
+{{end}}
+
+{{block content_main}}
+{{<< form}}
+
+<script>
+  $(function(){
+    var options = {
+      content: {
+        render: function(el) {
+          load(['ui.ckeditor'], function(){
+            CKEDITOR.config.extraPlugins = 'uploadimage'
+            CKEDITOR.config.uploadUrl = '/uploadfiles/upload_file?key={{=uuid}}'
+            CKEDITOR.config.imageUploadUrl = '/uploadfiles/upload_image?key={{=uuid}}'
+            CKEDITOR.replace(el[0])
+          })
+        }
+      }
+    }
+    form_widgets('form', options)
+  })
+</script>
+{{end}}

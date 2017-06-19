@@ -66,15 +66,14 @@ export default {
   },
   props: ['index', 'notitle'],
   mounted () {
-    var self = this
-    $.get('/comment?index='+this.index).success(function(r){
+    $.get('/comment?index='+this.index).success(r => {
       if (r.success) {
-        self.comments = r.comments
+        this.comments = r.comments
       }
     })
 
     //绑定编辑器
-    load(['ui.ckeditor'], function(){
+    load(['ui.ckeditor'], () => {
 
       CKEDITOR.config.height = 100
 
@@ -85,9 +84,9 @@ export default {
       CKEDITOR.config.autoGrow_bottomSpace = 20
 
       CKEDITOR.config.extraPlugins = 'uploadimage'
-      CKEDITOR.config.uploadUrl = '/uploadfiles/upload_file?key=' + self.index
-      CKEDITOR.config.imageUploadUrl = '/uploadfiles/upload_image?key=' + self.index
-      CKEDITOR.replace(self.$refs.content)
+      CKEDITOR.config.uploadUrl = '/uploadfiles/upload_file?key=' + this.index
+      CKEDITOR.config.imageUploadUrl = '/uploadfiles/upload_image?key=' + this.index
+      CKEDITOR.replace(this.$refs.content)
     })
 
   },

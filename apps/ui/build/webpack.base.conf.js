@@ -16,6 +16,7 @@ module.exports = {
     comment: './src/comment.js',
     task: './src/task.js',
     kanban: './src/kanban.js',
+    article: './src/article.js',
   },
   output: {
     path: config.build.assetsRoot,

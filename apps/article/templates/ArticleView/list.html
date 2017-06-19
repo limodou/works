@@ -1,0 +1,18 @@
+{{extend "article_layout.html"}}
+
+{{block content_main}}
+
+<div id="app">
+    <article-list></article-list>
+</div>
+
+{{use "ui.vue"}}
+{{link "works/css/article.css"}}
+{{link "works/js/article.js"}}
+
+<script>
+    var app = new Vue({
+        el: '#app'
+    })
+</script>
+{{end}}
