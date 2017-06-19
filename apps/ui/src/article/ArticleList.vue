@@ -1,10 +1,10 @@
 <template>
 <div class="article-list">
   <div class="row">
-    <div class="col-xs-7">
+    <div class="col-xs-9">
       <a class="btn btn-primary" href="/article/add">新文章</a>
     </div>
-    <div class="col-xs-5">
+    <div class="col-xs-3">
       <div class="form-group has-feedback">
         <input type="text" ref="search" class="form-control"
           placeholder="搜索文章"
@@ -63,5 +63,12 @@
   .article-list .article .info {
     color: gray;
     font-size: 12px;
+  }
+  .article-list .article h2>a {
+    text-decoration: none;
+    color: #0b0c0d;
+  }
+  .article-list .article h2>a:hover {
+    text-decoration: underline;
   }
 </style>
