@@ -6,7 +6,9 @@
     </div>
     <div class="col-xs-5">
       <div class="form-group has-feedback">
-        <input type="text" ref="search" class="form-control" placeholder="搜索文章">
+        <input type="text" ref="search" class="form-control"
+          placeholder="搜索文章"
+          @keyup.enter="handleSearch">
         <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
       </div>
     </div>
@@ -31,9 +33,24 @@
     },
 
     mounted () {
-      $.get('/article?data=1').success(r=>{
-        this.articles = r.rows
-      })
+      this.load()
+    },
+
+    methods: {
+      //装入数据
+      load (data) {
+        $.get('/article?data=1', data).success(r=>{
+          this.articles = r.rows
+        })
+      },
+
+      //处理搜索
+      handleSearch () {
+        if (this.$refs.search.value)
+          this.load({title:this.$refs.search.value})
+        else
+          this.load()
+      }
     }
   }
 </script>

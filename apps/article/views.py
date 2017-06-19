@@ -26,7 +26,7 @@ class ArticleView(functions.MultiView):
         creator = ReferenceSelectField('user', query=User.all().order_by(User.c.username.asc()))
 
         fields = [
-            {'name': 'title', 'type':'str', 'label':'标题/ID:'},
+            {'name': 'title', 'type':'str', 'label':'标题:'},
             {'name': 'category', 'type':'select', 'multiple': True, 'label':'分类:',
                 'choices':functions.get_parameter('article_category')},
             {'name': 'creator', 'choices':creator.get_choices(), 'type':'select', 'label':'作者'},
@@ -67,7 +67,7 @@ class ArticleView(functions.MultiView):
         condition = None
 
         if c.get('title'):
-            condition = (self.C.c.id.like(c['title']) | self.C.c.title.like('%'+c['title']+'%')) & condition
+            condition = self.C.c.title.like('%'+c['title']+'%')
         if c.get('category'):
             condition = (self.C.c.category.in_(c['category'])) & condition
         if c.get('creator'):
@@ -84,6 +84,7 @@ class ArticleView(functions.MultiView):
         return self._get_list(queryview=query,
                               queryform=query.get_json(),
                               condition=condition,
+                              order_by=self.C.c.created_time.desc(),
                               fields_convert_map={'content.title':content_title,
                                                   'content.created_time':content_created_time})
 
