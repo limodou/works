@@ -17,11 +17,6 @@ const prefixCls = 'alert'
 
 export default {
   name: 'Alert',
-  data () {
-    return {
-      current: this.value
-    }
-  },
   props:{
     buttonClass: {
       type: String,
@@ -50,7 +45,7 @@ export default {
     },
     current_title () {
       for(var i=0, _len=this.items.length; i<_len; i++) {
-        if (this.current == this.items[i][0])
+        if (this.value == this.items[i][0])
           return this.items[i][1]
       }
       return this.placeholder
@@ -58,7 +53,6 @@ export default {
   },
   methods: {
     select (item) {
-      this.current = item[0]
       this.$emit('input', item[0])
     }
   }

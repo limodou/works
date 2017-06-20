@@ -519,7 +519,14 @@ class IssueView(functions.MultiView):
                 }
 
     def kanban(self):
-        return {'domains':functions.get_parameter('domain')}
+        User = functions.get_model('user')
+        Milestone = functions.get_model('milestone')
+
+        users = User.get_choices()
+        return {'domains':functions.get_parameter('domain'),
+                'users':users,
+                'milestones': Milestone.get_choices()
+                }
 
     def _get_card_info(self, row):
         User = functions.get_model('user')
@@ -538,17 +545,21 @@ class IssueView(functions.MultiView):
 
         return card
 
-    def get_domain_data(self):
+    def get_data(self):
         """
         获得某个领域的需求信息
         """
         domain = request.GET.get('domain')
+        user = request.GET.get('user')
+        milestone = request.GET.get('milestone')
         result = []
         status = {}
         for s in functions.get_parameter('issue_status'):
             status[s[0]] = x = {'name': s[0], 'title': s[1], 'items': []}
             result.append(x)
-        for row in self.D.get_domain_data(domain=domain).order_by(self.C.c.modified_time.desc()):
+        for row in self.D.get_data(domain=domain,
+                                   user=user,
+                                   milestone=milestone).order_by(self.C.c.modified_time.desc()):
             d = self._get_card_info(row)
             items = status[d['status']]['items']
             items.append(d)

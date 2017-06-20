@@ -24,25 +24,37 @@
     <div slot="header">
       <dropdown :items="domains"
                 placeholder="请选择某个领域"
-                @input="change_domain"
-                v-model="domain"
+                @input="change"
+                v-model="query.domain"
       ></dropdown>
-      <button v-if="domain"
-              class="btn btn-default"
+      <dropdown :items="users"
+                placeholder="请选择责任人"
+                @input="change"
+                v-model="query.user"
+      ></dropdown>
+      <dropdown :items="milestones"
+                placeholder="请选择里程碑"
+                @input="change"
+                v-model="query.milestone"
+      ></dropdown>
+      <button class="btn btn-default"
               @click="refresh"
               data-toggle="tooltip"
               title="刷新"
       ><i class="fa fa-refresh"></i></button>
+      <button class="btn btn-default"
+              @click="clear">清除条件</button>
     </div>
   </kanban>
 </div>
 <script>
       var kanban = new Vue({
       el: '#kanban',
+
       methods: {
         //增加新的卡片, list是列的对象，主要用于获得是那个栏位
         add : function (status) {
-          window.open('/issue/add?domain='+this.domain+'&status='+status)
+          window.open('/issue/add?domain='+this.query.domain+'&status='+status)
         },
         //某个卡片移动到另一个list时的事件
         move: function (card_id, status) {
@@ -54,24 +66,33 @@
         open: function (card) {
           window.open('/issue/view/'+card.id)
         },
-        change_domain: function( value ) {
-          var self = this
-          $.get('/issue/get_domain_data?domain='+value).success(function(r){
-            self.lists = r.data
+        change: function() {
+          $.get('/issue/get_data', this.query).success(r=>{
+            this.lists = r.data
           })
         },
         refresh: function () {
-          this.change_domain(this.domain)
+          this.change()
+        },
+        clear: function () {
+          this.query = {domain: '', user: '', milestone: ''}
+          this.change()
         }
       },
       data: {
-        domain: '',
+        query: {
+          domain: '',
+          user: '',
+          milestone: ''
+        },
         list_width: 270,
-        domains: {{$ domains}},
+        domains: {{$ domains}}, //领域
+        milestones: {{$ milestones}}, //里程碑
+        users: {{$ users}}, //责任人
         lists: []
       },
       mounted: function () {
-        this.change_domain('')
+        this.change()
       }
 
     })

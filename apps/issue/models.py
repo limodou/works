@@ -197,7 +197,7 @@ class ContentDetailIssue(ContentDetail):
     #     ]
 
     @classmethod
-    def get_domain_data(cls, domain, condition=None):
+    def get_data(cls, domain=None, user=None, milestone=None, condition=None):
         from sqlalchemy import and_
 
         C = functions.get_model('content')
@@ -205,5 +205,9 @@ class ContentDetailIssue(ContentDetail):
         cond = and_(cls.c.content_id==C.c.id, condition)
         if domain:
             cond = (cls.c.domain==domain) & cond
+        if user:
+            cond = (cls.c.responsible==user) & cond
+        if milestone:
+            cond = (cls.c.milestone==milestone) & cond
 
         return cls.filter(cond)
