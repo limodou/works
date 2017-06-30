@@ -1,4 +1,4 @@
-{{extend "article_layout.html"}}
+{{extend "article_layout.html" extend "site/layout0.html"}}
 
 {{block content_header}}
 {{end}}
@@ -11,11 +11,15 @@
 {{link "works/css/comment.css"}}
 
 <div id="app">
-  <article-content :info="info"></article-content>
-
-  <comment :index="index"></comment>
-
+    <article-content :info="info"></article-content>
+    <div class="row">
+      <div class="col-xs-2"></div>
+      <div class="col-xs-8">
+          <comment :index="index"></comment>
+      </div>
+    </div>
 </div>
+
 <script>
     var app = new Vue({
       el: '#app',
@@ -27,7 +31,9 @@
           created_time: {{$ created_time}},
           content: {{$ content}},
           content_id: {{$ object.content_id}},
-          deletable: {{$ content_obj._creator_ == request.user.id}}
+          deletable: {{$ content_obj._creator_ == request.user.id}},
+          category_dis: {{$ category_dis}},
+          category: {{$ category}}
         }
       }
     })

@@ -48,12 +48,15 @@ class IssueView(functions.MultiView):
             {'name': 'responsible', 'choices':responsible.get_choices(), 'type':'select', 'label':'责任人'},
             {'name': 'submitter', 'type':'str', 'label':'提出人'},
             {'name': 'submitted_date', 'type':'date', 'range':True, 'label':'提出时间'},
+            {'name': 'in_task_list', 'type':'select',
+                'choices':[('0', '否'), ('1', '是')],
+                'label':'是否在开发任务列表中'},
         ]
         layout = [
             ['title', 'domain', 'status'],
             ['submitter', 'submitted_date'],
             ['responsible', 'source', 'category'],
-            ['deploy', 'milestone']
+            ['deploy', 'milestone', 'in_task_list']
         ]
         query = QueryView(fields=fields, layout=layout, form_cls=QueryForm)
         return query
@@ -95,6 +98,8 @@ class IssueView(functions.MultiView):
             condition = (self.D.c.responsible==c['responsible']) & condition
         if c.get('milestone'):
             condition = (self.D.c.milestone==c['milestone']) & condition
+        if c.get('in_task_list'):
+            condition = (self.D.c.in_task_list==(c['in_task_list']=='1')) & condition
 
         def content_title(value, obj):
             return u'<a href="/issue/view/{}" target="_blank">{}</a>'.format(obj['content.id'],
@@ -184,6 +189,8 @@ class IssueView(functions.MultiView):
                 return TextField(u'内容')
             if name == 'memo':
                 return TextField(u'备注')
+            if name == 'summary':
+                return TextField(u'解决方案', help_string='简要描述方案，如：可能涉及增加或修改的模块或交易')
             if name == 'title':
                 return StringField(u'标题', required=True)
             if name == 'category':
@@ -208,6 +215,7 @@ class IssueView(functions.MultiView):
         def post_save(obj, data):
             extend = self.E(content_id=obj.content_id,
                             memo=data['memo'],
+                            summary=data['summary'],
                             content=data['content'])
             extend.save()
 
@@ -248,6 +256,8 @@ class IssueView(functions.MultiView):
                 return TextField(u'内容')
             if name == 'memo':
                 return TextField(u'备注')
+            if name == 'summary':
+                return TextField(u'解决方案', help_string='简要描述方案，如：可能涉及增加或修改的模块或交易')
             if name == 'title':
                 return StringField(u'标题', required=True)
             if name == 'category':
@@ -261,17 +271,22 @@ class IssueView(functions.MultiView):
 
 
         def post_save(obj, data):
-            content.update(title=data['title'], category=data['category'])
+            from uliweb.utils import date
+            from uliweb import request
+
+            content.update(title=data['title'], category=data['category'],
+                           modified_user=request.user.id, modified_time=date.now())
             r1 = content.save()
 
-            extend.update(content=data['content'], memo=data['memo'])
+            extend.update(content=data['content'], memo=data['memo'], summary=data['summary'])
             r2 = extend.save()
             return r1 or r2
 
         data = {'title': content.title,
                 'content': extend.content,
                 'memo': extend.memo,
-                'category': content.category}
+                'category': content.category,
+                'summary': extend.summary}
 
         return self._edit(self.D,
                          obj=detail,
@@ -340,7 +355,6 @@ class IssueView(functions.MultiView):
         if not value:
             return True, ''
         values = functions.get_parameter('issue_status')
-        print '====', values
         for key, display in values:
             if display == value:
                 return True, key
@@ -505,17 +519,20 @@ class IssueView(functions.MultiView):
                 'title': obj.title,
                 'object': detail,
                 'content': extend.content,
+                'summary': extend.summary,
                 'memo': extend.memo,
                 'status': self.D.status.get_display_value(detail.status),
                 'time': '{} / {}'.format(detail.plan_begin_date or '-', detail.plan_finish_date or '-'),
                 'responsible': unicode(detail.responsible or ''),
                 'page_num': detail.page_num,
                 'trans_num': detail.trans_num,
+                'batch_num': detail.batch_num,
                 'key': obj.uuid,
                 'creator': unicode(obj.creator),
                 'created_time': timesince(obj.created_time),
                 'milestone': unicode(detail.milestone),
                 'submitter': unicode(detail.submitter),
+                'in_task_list': detail.in_task_list,
                 }
 
     def kanban(self):
@@ -533,14 +550,14 @@ class IssueView(functions.MultiView):
 
         card = {}
 
-        card['id'] = row.id
+        card['id'] = row.content_id
         card['title'] = row.get_content().title
         card['user'] = unicode(row.responsible or u'未指派')
         if row.responsible:
             card['avater'] = row.responsible.get_image_url()
         else:
             card['avater'] = User.get_default_image_url()
-        card['url'] = '/issue/view/{}'.format(row.id)
+        card['url'] = '/issue/view/{}'.format(row.content_id)
         card['status'] = row.status or '01'
 
         return card
@@ -559,7 +576,8 @@ class IssueView(functions.MultiView):
             result.append(x)
         for row in self.D.get_data(domain=domain,
                                    user=user,
-                                   milestone=milestone).order_by(self.C.c.modified_time.desc()):
+                                   milestone=milestone,
+                                   condition=self.C.c.deleted==False).order_by(self.C.c.modified_time.desc()):
             d = self._get_card_info(row)
             items = status[d['status']]['items']
             items.append(d)

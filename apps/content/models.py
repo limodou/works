@@ -5,6 +5,12 @@ from uliweb.orm import *
 from uliweb.utils.common import cached_property
 from sqlalchemy.sql import and_, or_
 
+def get_modified_user():
+    from uliweb import request
+
+    if hasattr(request, 'user') and request.user:
+        return request.user.id
+
 class Content(Model):
     """
     文章类型
@@ -20,6 +26,7 @@ class Content(Model):
     hits = Field(int, verbose_name='点击次数')
     deleted = Field(bool, verbose_name='删除', server_default='0')
     created_time = Field(DATETIME, verbose_name='创建时间', auto_now_add=True)
+    modified_user = Reference('user', verbose_name='修改人', auto_add=True, auto=True, default=get_modified_user)
     modified_time = Field(DATETIME, verbose_name='修改时间', auto_now_add=True, auto_now=True)
     version = Field(int)
 
@@ -83,6 +90,7 @@ class ContentExtend(Model):
     """
     content_id = Field(int)
     content = Field(TEXT, verbose_name='内容')
+    summary = Field(TEXT, verbose_name='摘要')
     info = Field(JSON, verbose_name='扩展信息')
     memo = Field(TEXT, verbose_name='备注')
     created_time = Field(DATETIME, verbose_name='创建时间', auto_now_add=True)

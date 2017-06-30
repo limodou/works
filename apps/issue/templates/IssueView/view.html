@@ -53,6 +53,28 @@
     <a href="/issue/edit/{{=object.content_id}}" class="btn btn-success">编辑</a>
   </div>
 
+  <div class="box box-default">
+    <div class="box-header with-border">
+      <h3 class="box-title">解决方案</h3>
+
+      <div class="box-tools pull-right">
+        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+        </button>
+      </div>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+      {{<< summary}}
+    </div>
+    <div class="box-footer text-right">
+      <small>
+        计入开发任务列表：{{if in_task_list:}}<i class="fa fa-check-square-o"></i>{{else:}}<i class="fa fa-square-o"></i>{{pass}}&nbsp;&nbsp;
+        页面数: {{=page_num}}&nbsp;&nbsp;
+        交易数: {{=trans_num}}&nbsp;&nbsp;
+        批处理数: {{=batch_num}}</small>
+    </div>
+  </div>
+
   <div class="nav-tabs-custom">
     <ul class="nav nav-tabs">
       <router-link tag='li' active-class="active"

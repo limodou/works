@@ -41,3 +41,7 @@ def get_parameter(name):
     else:
         result = _db()
     return result
+
+def get_parameter_display(name, value):
+    result = dict(get_parameter(name))
+    return result.get(value, '')

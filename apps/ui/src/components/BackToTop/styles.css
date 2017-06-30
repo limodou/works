@@ -1,0 +1,24 @@
+.back-to-top-fade-enter-active, .back-to-top-fade-leave-active {
+  transition: opacity .7s;
+}
+.back-to-top-fade-enter, .back-to-top-fade-leave-to{
+  opacity: 0;
+}
+
+.vue-back-to-top{
+  position: fixed;
+  bottom: 40px;
+  right: 30px;
+  width: 120px;
+  color: #ffffff;
+  text-align: center;
+  line-height: 30px;
+  background-color: #1853ab;
+  border-radius: 3px;
+  z-index: 1000;
+  cursor:pointer;
+}
+
+.vue-back-to-top a{
+  color:#ffffff;
+}

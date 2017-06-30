@@ -13,11 +13,12 @@ class ContentDetailIssue(ContentDetail):
     """
     需求、问题类型
     """
-    domain = Field(str, max_length=10, verbose_name='领域',
+    domain = Field(str, max_length=20, verbose_name='领域',
                    choices=functions.parameter_choices('domain'))
-    source = Field(str, max_length=10, verbose_name='来源',
+    source = Field(str, max_length=20, verbose_name='来源',
                    choices=functions.parameter_choices('source'))
-    deploy = Field(str, max_length=10, verbose_name='部署',
+    source_desc = Field(str, max_length=256, verbose_name='来源说明')
+    deploy = Field(str, max_length=20, verbose_name='部署',
                    choices=functions.parameter_choices('deploy'))
     responsible = Reference('user', verbose_name='责任人', index=True)
     plan_begin_date = Field(DATE, verbose_name='开始时间')
@@ -33,9 +34,16 @@ class ContentDetailIssue(ContentDetail):
                        verbose_name='状态')
     page_num = Field(int, verbose_name='页面数')
     trans_num = Field(int, verbose_name='交易数')
+    batch_num = Field(int, verbose_name='批处理数')
     task_num = Field(int, verbose_name='任务数')
     submitter = Field(str, max_length=80, verbose_name='提出人')
     submitted_date = Field(DATE, verbose_name='提出时间')
+    in_task_list = Field(bool, verbose_name='是否加入开发任务跟踪表', default=False, server_default='0')
+    task_id = Field(int, verbose_name='任务序号')
+
+    cooperate_system = Field(str, max_length=80, verbose_name='配合组件系统')
+    cooperate_task = Field(str, max_length=1024, verbose_name='配合开发事项')
+    cooperate_test = Field(str, max_length=256, verbose_name='配合测试组件')
 
     class Table:
         fields = [
@@ -44,16 +52,19 @@ class ContentDetailIssue(ContentDetail):
             {'name':'content.category', 'align':'center', 'width':80},
             # {'name':'content.group', 'hidden':True},
             #{'name':'content.content_type'},
-            {'name':'content.title', 'width':300},
-            {'name':'contentdetailissue.priority', 'align':'center', 'width':60},
+            {'name':'content.title', 'width':200},
+            {'name':'contentextend.summary', 'width':200, 'verbose_name':'解决方案'},
             {'name':'contentdetailissue.source', 'align':'center', 'width':80},
             {'name':'contentdetailissue.responsible', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.status', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.milestone', 'align':'center', 'width':90},
             {'name':'contentdetailissue.deploy', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.priority', 'align':'center', 'width':60},
             {'name':'contentdetailissue.page_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.trans_num', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.batch_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.plan_begin_date', 'align':'center', 'width':100},
             {'name':'contentdetailissue.plan_finish_date', 'align':'center', 'width':100},
-            {'name':'contentdetailissue.status', 'align':'center', 'width':80},
             {'name':'contentdetailissue.submitter', 'align':'center', 'width':80},
             {'name':'contentdetailissue.submitted_date', 'align':'center', 'width':100, 'sortable':True},
             {'name':'contentdetailissue.percent', 'align':'center', 'width':80},
@@ -63,7 +74,46 @@ class ContentDetailIssue(ContentDetail):
             {'name':'content.hits', 'hidden':True},
             {'name':'content.created_time', 'hidden':True},
             #{'name':'content.modified_time'},
+            {'name':'contentdetailissue.in_task_list', 'align':'center', 'width':90},
+            {'name':'contentdetailissue.task_id', 'align':'center', 'width':90},
+        ]
+
+    class Download:
+        fields = [
+            {'name':'content.id', 'title':'ID', 'width':40, 'align':'center'},
+            {'name':'contentdetailissue.domain', 'align':'center', 'width':120},
+            {'name':'content.category', 'align':'center', 'width':80},
+            # {'name':'content.group', 'hidden':True},
+            #{'name':'content.content_type'},
+            {'name':'content.title', 'width':300},
+            {'name':'contentdetailissue.source', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.source_desc', 'width':80},
+            {'name':'contentdetailissue.responsible', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.status', 'align':'center', 'width':80},
             {'name':'contentdetailissue.milestone', 'align':'center', 'width':90},
+            {'name':'contentdetailissue.deploy', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.priority', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.page_num', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.trans_num', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.batch_num', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.plan_begin_date', 'align':'center', 'width':100},
+            {'name':'contentdetailissue.plan_finish_date', 'align':'center', 'width':100},
+            {'name':'contentdetailissue.submitter', 'align':'center', 'width':80},
+            {'name':'contentdetailissue.submitted_date', 'align':'center', 'width':100, 'sortable':True},
+            {'name':'contentdetailissue.percent', 'align':'center', 'width':80},
+            # {'name':'content.memo', 'width':80},
+            {'name':'content.labels', 'hidden':True},
+            {'name':'content.creator', 'align':'center', 'width':80, 'hidden':True},
+            {'name':'content.hits', 'hidden':True},
+            {'name':'content.created_time', 'hidden':True},
+            #{'name':'content.modified_time'},
+            {'name':'contentextend.memo', 'width':200},
+            {'name':'contentextend.summary', 'width':200, 'verbose_name':'解决方案'},
+            {'name':'contentdetailissue.in_task_list', 'align': 'center', 'width': 90},
+            {'name':'contentdetailissue.task_id', 'align': 'center', 'width': 90},
+            {'name':'contentdetailissue.cooperate_system', 'width': 90},
+            {'name':'contentdetailissue.cooperate_task', 'width': 90},
+            {'name':'contentdetailissue.cooperate_test', 'width': 90},
         ]
 
     class Batch:
@@ -74,11 +124,11 @@ class ContentDetailIssue(ContentDetail):
             {'name':'contentdetailissue.domain', 'editor':'select', 'selectOptions':get_source('domain')},
             {'name':'content.category', 'editor':'select', 'selectOptions':get_source('issue_category')},
             {'name':'content.title'},
-            {'name':'contentdetailissue.priority', 'editor':'select', 'selectOptions':get_source('issue_priority')},
             {'name':'contentdetailissue.source', 'editor':'select', 'selectOptions':get_source('source')},
             {'name':'contentdetailissue.responsible'},
             {'name':'contentdetailissue.deploy', 'editor':'select',
                 'selectOptions':get_source('deploy')},
+            {'name':'contentdetailissue.priority', 'editor':'select', 'selectOptions':get_source('issue_priority')},
             {'name':'contentdetailissue.page_num'},
             {'name':'contentdetailissue.trans_num'},
             {'name':'contentdetailissue.plan_begin_date'},
@@ -102,6 +152,7 @@ class ContentDetailIssue(ContentDetail):
             'category',
             'domain',
             'source',
+            'source_desc',
             'title', 'priority',
             'milestone',
             'plan_begin_date', 'plan_finish_date',
@@ -109,6 +160,7 @@ class ContentDetailIssue(ContentDetail):
             'responsible',
             'page_num',
             'trans_num',
+            'batch_num',
             'content',
             'memo',
             'uuid',
@@ -116,6 +168,12 @@ class ContentDetailIssue(ContentDetail):
             'deploy',
             'submitter',
             'submitted_date',
+            'in_task_list',
+            'task_id',
+            'summary',
+            'cooperate_system',
+            'cooperate_task',
+            'cooperate_test',
         ]
 
         layout = [
@@ -123,16 +181,23 @@ class ContentDetailIssue(ContentDetail):
             'title',
             'content',
             ['submitter', 'submitted_date'],
+            ['source', 'source_desc'],
             'memo',
             '-- 分类信息 --',
             ['domain', 'category'],
-            ['source', 'priority'],
+            'priority',
             ['deploy', 'milestone'],
+            ['in_task_list', 'task_id'],
             '-- 处理状态 --',
             'responsible',
+            'summary',
             ['plan_begin_date', 'plan_finish_date'],
             ['status', 'percent'],
-            ['page_num', 'trans_num'],
+            ['page_num', 'trans_num', 'batch_num'],
+            '-- 关联组件配合情况 --',
+            'cooperate_system',
+            'cooperate_task',
+            'cooperate_test',
         ]
 
     class EditForm:
@@ -140,6 +205,7 @@ class ContentDetailIssue(ContentDetail):
             'category',
             'domain',
             'source',
+            'source_desc',
             'title', 'priority',
             'milestone',
             'plan_begin_date', 'plan_finish_date',
@@ -147,12 +213,19 @@ class ContentDetailIssue(ContentDetail):
             'responsible',
             'page_num',
             'trans_num',
+            'batch_num',
             'content',
             'memo',
             'status',
             'deploy',
             'submitter',
             'submitted_date',
+            'in_task_list',
+            'task_id',
+            'summary',
+            'cooperate_system',
+            'cooperate_task',
+            'cooperate_test',
         ]
 
         layout = [
@@ -160,16 +233,23 @@ class ContentDetailIssue(ContentDetail):
             'title',
             'content',
             ['submitter', 'submitted_date'],
+            ['source', 'source_desc'],
             'memo',
             '-- 分类信息 --',
             ['domain', 'category'],
-            ['source', 'priority'],
+            'priority',
             ['deploy', 'milestone'],
+            ['in_task_list', 'task_id'],
             '-- 处理状态 --',
             'responsible',
+            'summary',
             ['plan_begin_date', 'plan_finish_date'],
             ['status', 'percent'],
-            ['page_num', 'trans_num'],
+            ['page_num', 'trans_num', 'batch_num'],
+            '-- 关联组件配合情况 --',
+            'cooperate_system',
+            'cooperate_task',
+            'cooperate_test',
         ]
 
     # class DetailView:

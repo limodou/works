@@ -17,7 +17,9 @@
     <div class="col-xs-12">
       <h2><a :href="`/article/view/${article['content.id']}`">{{article['content.title']}}</a></h2>
       <div class="info">
-        作者: {{article['content.creator']}} {{article['content.created_time']}}
+        {{article['content.creator']}} · {{article['content.created_time']}}
+        <template v-if="article['content.category']">
+          · <span v-html="article['content.category']"></span>
       </div>
     </div>
   </div>
@@ -32,14 +34,26 @@
       }
     },
 
+    props: {
+      url: {
+        type: String
+      },
+      category: {
+        type: String
+      }
+    },
+
     mounted () {
       this.load()
     },
 
     methods: {
       //装入数据
-      load (data) {
-        $.get('/article?data=1', data).success(r=>{
+      load (data={}) {
+        let d = Object.assign({
+          category:this.category
+        }, data)
+        $.get(this.url, d).success(r=>{
           this.articles = r.rows
         })
       },
@@ -69,6 +83,6 @@
     color: #0b0c0d;
   }
   .article-list .article h2>a:hover {
-    text-decoration: underline;
+    color: red;
   }
 </style>

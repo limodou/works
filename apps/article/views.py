@@ -27,7 +27,7 @@ class ArticleView(functions.MultiView):
 
         fields = [
             {'name': 'title', 'type':'str', 'label':'标题:'},
-            {'name': 'category', 'type':'select', 'multiple': True, 'label':'分类:',
+            {'name': 'category', 'type':'select', 'label':'分类:',
                 'choices':functions.get_parameter('article_category')},
             {'name': 'creator', 'choices':creator.get_choices(), 'type':'select', 'label':'作者'},
         ]
@@ -58,7 +58,7 @@ class ArticleView(functions.MultiView):
     @expose('')
     def list(self):
         """
-        显示需求/问题清单
+        显示文章清单
         :return:
         """
 
@@ -69,7 +69,7 @@ class ArticleView(functions.MultiView):
         if c.get('title'):
             condition = self.C.c.title.like('%'+c['title']+'%')
         if c.get('category'):
-            condition = (self.C.c.category.in_(c['category'])) & condition
+            condition = (self.C.c.category==c['category']) & condition
         if c.get('creator'):
             condition = (self.D.c.creator==c['creator']) & condition
 
@@ -81,12 +81,19 @@ class ArticleView(functions.MultiView):
 
             return timesince(obj['content.created_time'])
 
+        def content_category(value, obj):
+            if value:
+                title = functions.get_parameter_display('article_category', value)
+                return u'<a href="/article?category={}">{}</a>'.format(value, title)
+            return value
+
         return self._get_list(queryview=query,
                               queryform=query.get_json(),
                               condition=condition,
                               order_by=self.C.c.created_time.desc(),
                               fields_convert_map={'content.title':content_title,
-                                                  'content.created_time':content_created_time})
+                                                  'content.created_time':content_created_time,
+                                                  'content.category':content_category})
 
     def add(self):
         """
@@ -208,5 +215,7 @@ class ArticleView(functions.MultiView):
                 'uuid': obj.uuid,
                 'creator': unicode(obj.creator),
                 'created_time': timesince(obj.created_time),
+                'category_dis': functions.get_parameter_display('article_category', obj.category),
+                'category': obj.category,
                 }
 

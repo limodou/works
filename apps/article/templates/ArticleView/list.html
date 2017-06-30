@@ -3,7 +3,7 @@
 {{block content_main}}
 
 <div id="app">
-    <article-list></article-list>
+    <article-list :url="url" :category="category"></article-list>
 </div>
 
 {{use "ui.vue"}}
@@ -12,7 +12,11 @@
 
 <script>
     var app = new Vue({
-        el: '#app'
+        el: '#app',
+        data: {
+            url: '/article?data=1',
+            category: {{$ request.GET.get('category', '')}}
+        }
     })
 </script>
 {{end}}

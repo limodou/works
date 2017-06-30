@@ -67,8 +67,9 @@
           window.open('/issue/view/'+card.id)
         },
         change: function() {
-          $.get('/issue/get_data', this.query).success(r=>{
-            this.lists = r.data
+          var self = this
+          $.get('/issue/get_data', this.query).success(function(r){
+            self.lists = r.data
           })
         },
         refresh: function () {

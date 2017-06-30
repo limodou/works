@@ -9,3 +9,5 @@ alembic
 sessions
 uploads
 node_modules
+files
+data
