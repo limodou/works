@@ -105,10 +105,18 @@ class IssueView(functions.MultiView):
             return u'<a href="/issue/view/{}" target="_blank">{}</a>'.format(obj['content.id'],
                                                             obj['content.title'])
 
+        def in_task_list(value, obj):
+            if value:
+                return u'是'
+            else:
+                return u'否'
+
         return self._get_list(queryview=query,
                               queryform=query.get_json(),
                               condition=condition,
-                              fields_convert_map={'content.title':content_title})
+                              fields_convert_map={'content.title': content_title,
+                                                  'contentdetailissue.in_task_list': in_task_list
+                                                  })
 
     def batch(self):
         """
@@ -226,6 +234,7 @@ class IssueView(functions.MultiView):
         data = {'uuid':uuid}
         data['status'] = request.GET.get('status', '01')
         data['domain'] = request.GET.get('domain', '')
+        data['submitter'] = request.user.nickname
 
         return self._add('contentdetailissue',
                          pre_save=pre_save,
@@ -322,7 +331,6 @@ class IssueView(functions.MultiView):
             return True, list(u)[0].id
 
     _validate_responsible = _validate_creator
-    _validate_submitter = _validate_creator
 
     def _validate_priority(self, value):
         if not value:
@@ -428,6 +436,13 @@ class IssueView(functions.MultiView):
         if value and len(value)>200:
             return False, '标题不能超过200个字符'
         return True, value
+
+    def _validate_in_task_list(self, value):
+        if value == u'是':
+            return True, True
+        if value == u'否':
+            return True, False
+        return False, '只能输入"是"或"否"'
 
     def _parse_data(self, index, data):
         """

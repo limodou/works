@@ -32,6 +32,7 @@ class ContentDetailIssue(ContentDetail):
     status = Field(str, max_length=10,
                        choices=functions.parameter_choices('issue_status'),
                        verbose_name='状态')
+    workload = Field(DECIMAL, verbose_name='工作量(人天)', scale=1)
     page_num = Field(int, verbose_name='页面数')
     trans_num = Field(int, verbose_name='交易数')
     batch_num = Field(int, verbose_name='批处理数')
@@ -60,6 +61,7 @@ class ContentDetailIssue(ContentDetail):
             {'name':'contentdetailissue.milestone', 'align':'center', 'width':90},
             {'name':'contentdetailissue.deploy', 'align':'center', 'width':80},
             {'name':'contentdetailissue.priority', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.workload', 'align':'center', 'width':60},
             {'name':'contentdetailissue.page_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.trans_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.batch_num', 'align':'center', 'width':60},
@@ -93,6 +95,7 @@ class ContentDetailIssue(ContentDetail):
             {'name':'contentdetailissue.milestone', 'align':'center', 'width':90},
             {'name':'contentdetailissue.deploy', 'align':'center', 'width':80},
             {'name':'contentdetailissue.priority', 'align':'center', 'width':60},
+            {'name':'contentdetailissue.workload', 'align':'center', 'width':60},
             {'name':'contentdetailissue.page_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.trans_num', 'align':'center', 'width':60},
             {'name':'contentdetailissue.batch_num', 'align':'center', 'width':60},
@@ -107,6 +110,7 @@ class ContentDetailIssue(ContentDetail):
             {'name':'content.hits', 'hidden':True},
             {'name':'content.created_time', 'hidden':True},
             #{'name':'content.modified_time'},
+            {'name':'contentextend.content', 'width':400},
             {'name':'contentextend.memo', 'width':200},
             {'name':'contentextend.summary', 'width':200, 'verbose_name':'解决方案'},
             {'name':'contentdetailissue.in_task_list', 'align': 'center', 'width': 90},
@@ -125,26 +129,30 @@ class ContentDetailIssue(ContentDetail):
             {'name':'content.category', 'editor':'select', 'selectOptions':get_source('issue_category')},
             {'name':'content.title'},
             {'name':'contentdetailissue.source', 'editor':'select', 'selectOptions':get_source('source')},
+            {'name':'contentdetailissue.source_desc'},
             {'name':'contentdetailissue.responsible'},
+            {'name':'contentdetailissue.status', 'editor':'select', 'selectOptions':get_source('issue_status')},
+            {'name':'contentdetailissue.milestone', 'editor':'select', 'selectOptions':get_source('milestone')},
             {'name':'contentdetailissue.deploy', 'editor':'select',
                 'selectOptions':get_source('deploy')},
             {'name':'contentdetailissue.priority', 'editor':'select', 'selectOptions':get_source('issue_priority')},
+            {'name':'contentdetailissue.workload'},
             {'name':'contentdetailissue.page_num'},
             {'name':'contentdetailissue.trans_num'},
+            {'name':'contentdetailissue.batch_num'},
             {'name':'contentdetailissue.plan_begin_date'},
             {'name':'contentdetailissue.plan_finish_date'},
-            {'name':'contentdetailissue.status', 'editor':'select', 'selectOptions':get_source('issue_status')},
             {'name':'contentdetailissue.submitter'},
             {'name':'contentdetailissue.submitted_date'},
             {'name':'contentdetailissue.percent'},
-            {'name':'contentextend.memo', 'width':80},
-            {'name':'content.labels', 'hidden':True},
-            {'name':'content.creator'},
-            {'name':'content.hits', 'hidden':True},
-            {'name':'content.created_time', 'hidden':True},
-            #{'name':'content.modified_time'},
-            {'name':'contentdetailissue.milestone'},
-            {'name':'contentextend.content'},
+            # {'name':'contentextend.content'},
+            {'name':'contentextend.memo'},
+            {'name':'contentextend.summary', 'verbose_name':'解决方案'},
+            {'name':'contentdetailissue.in_task_list', 'editor':'select', 'selectOptions': [u'是', u'否']},
+            {'name':'contentdetailissue.task_id'},
+            {'name':'contentdetailissue.cooperate_system'},
+            {'name':'contentdetailissue.cooperate_task'},
+            {'name':'contentdetailissue.cooperate_test'},
         ]
 
     class AddForm:
@@ -174,6 +182,7 @@ class ContentDetailIssue(ContentDetail):
             'cooperate_system',
             'cooperate_task',
             'cooperate_test',
+            'workload',
         ]
 
         layout = [
@@ -191,7 +200,7 @@ class ContentDetailIssue(ContentDetail):
             '-- 处理状态 --',
             'responsible',
             'summary',
-            ['plan_begin_date', 'plan_finish_date'],
+            ['workload', 'plan_begin_date', 'plan_finish_date'],
             ['status', 'percent'],
             ['page_num', 'trans_num', 'batch_num'],
             '-- 关联组件配合情况 --',
@@ -226,6 +235,7 @@ class ContentDetailIssue(ContentDetail):
             'cooperate_system',
             'cooperate_task',
             'cooperate_test',
+            'workload',
         ]
 
         layout = [
@@ -243,7 +253,7 @@ class ContentDetailIssue(ContentDetail):
             '-- 处理状态 --',
             'responsible',
             'summary',
-            ['plan_begin_date', 'plan_finish_date'],
+            ['workload', 'plan_begin_date', 'plan_finish_date'],
             ['status', 'percent'],
             ['page_num', 'trans_num', 'batch_num'],
             '-- 关联组件配合情况 --',
