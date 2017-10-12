@@ -35,8 +35,9 @@
               <a class="kanban-card-title" href='#'
                 @click.prevent="open(card)">{{ card.title }}</a>
               <div class="pull-right">
-                <img class="img-circle img-sm" data-toggle="tooltip"
+                <img v-if="!onlyName" class="img-circle img-sm" data-toggle="tooltip"
                   :data-original-title="card.user" :src="card.avater">
+                <span v-else>{{card.user}}</span>
               </div>
             </div>
 
@@ -109,6 +110,10 @@ export default {
     minHeight: {
       type: Number,
       default: 450
+    },
+    onlyName: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

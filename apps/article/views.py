@@ -84,13 +84,18 @@ class ArticleView(functions.MultiView):
         def content_category(value, obj):
             if value:
                 title = functions.get_parameter_display('article_category', value)
-                return u'<a href="/article?category={}">{}</a>'.format(value, title)
-            return value
+                return {'value':value, 'text':title}
+            return {'value':value, 'text':''}
+
+        template_data = {}
+        categories = functions.get_parameter('article_category')
+        template_data['categories'] = categories
 
         return self._get_list(queryview=query,
                               queryform=query.get_json(),
                               condition=condition,
                               order_by=self.C.c.created_time.desc(),
+                              template_data=template_data,
                               fields_convert_map={'content.title':content_title,
                                                   'content.created_time':content_created_time,
                                                   'content.category':content_category})

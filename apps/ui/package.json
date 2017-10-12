@@ -11,6 +11,7 @@
     "build:watch": "watch 'npm run build' ./src"
   },
   "dependencies": {
+    "iview": "^2.3.2",
     "vue": "^2.4.1",
     "vue-router": "^2.5.3",
     "vue-sortable": "^0.1.3",

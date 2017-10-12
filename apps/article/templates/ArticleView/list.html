@@ -3,7 +3,7 @@
 {{block content_main}}
 
 <div id="app">
-    <article-list :url="url" :category="category"></article-list>
+    <article-list :url="url" :category="category" :categories="categories"></article-list>
 </div>
 
 {{use "ui.vue"}}
@@ -15,7 +15,9 @@
         el: '#app',
         data: {
             url: '/article?data=1',
-            category: {{$ request.GET.get('category', '')}}
+            category: {{$ request.GET.get('category', '')}},
+            categories: {{$ [{'value':'', 'text':'全部'}] +
+                [{'value':value, 'text':text} for value, text in categories] }}
         }
     })
 </script>

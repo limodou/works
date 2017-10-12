@@ -41,7 +41,8 @@ module.exports = {
           commonjs: 'vue',
           commonjs2: 'vue',
           amd: 'vue'
-      }
+      },
+      iview: 'iview'
   },
   module: {
     rules: [

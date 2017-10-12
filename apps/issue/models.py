@@ -49,7 +49,7 @@ class ContentDetailIssue(ContentDetail):
     class Table:
         fields = [
             {'name':'content.id', 'title':'ID', 'width':40, 'align':'center'},
-            {'name':'contentdetailissue.domain', 'align':'center', 'width':120},
+            {'name':'contentdetailissue.domain', 'align':'center', 'width':120, 'sortable': True},
             {'name':'content.category', 'align':'center', 'width':80},
             # {'name':'content.group', 'hidden':True},
             #{'name':'content.content_type'},

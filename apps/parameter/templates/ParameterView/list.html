@@ -103,7 +103,7 @@
       parameters: []
     },
     methods: {
-      handleSelected (param_id) {
+      handleSelected: function (param_id) {
         parameter_id = param_id
         var u = get_url('/settings/parameter?data=1', {parameter:param_id})
         grid.load(u)

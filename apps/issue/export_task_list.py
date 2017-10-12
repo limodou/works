@@ -29,11 +29,11 @@ def process():
                         and_(C.c.id==E.c.content_id,
                             C.c.id==D.c.content_id,
                             D.c.responsible==User.c.id,
-                            D.c.milestone==1,
-                            D.c.status.in_(['01', '03', '05', '08', '09', '10']),
-                            D.c.in_task_list==True,
-                            C.c.category.in_(['issue', 'reqbase',
-                                              'reqother', 'sysimp', 'sysbug', 'chenting']),
+                            D.c.milestone==3,
+                            # D.c.status.in_(['01', '03', '05', '08', '09', '10']),
+                            # D.c.in_task_list==True,
+                            # C.c.category.in_(['issue', 'reqbase',
+                            #                   'reqother', 'sysimp', 'sysbug', 'chenting']),
                             C.c.deleted==False,
                              )
                       )
@@ -107,7 +107,7 @@ def process():
 
         d = [#开发任务整体情况
              row.task_id, 'ITDM', u'开发三组', 'ITDM', type, '',
-             row.title, '20170729', status,
+             row.title, '20171027', status,
              #开发任务详细情况
              row.summary, p8_deploy, row.nickname, source, '',
              #关联组件配合情况
