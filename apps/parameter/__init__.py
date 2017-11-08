@@ -16,7 +16,6 @@ def get_parameter(name):
     PV = functions.get_model('parametervalues')
     cache = settings.get_var('PARAMETER/cache')
     timeout = settings.get_var('PARAMETER/timeout')
-    redis = functions.get_redis()
 
     def _db():
         para = P.get(P.c.name == name)
@@ -29,6 +28,7 @@ def get_parameter(name):
             return []
 
     if cache:
+        redis = functions.get_redis()
         result = None
         ##反序列化
         value = redis.get(name)
