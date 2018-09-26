@@ -3,8 +3,9 @@
 from uliweb.orm import *
 
 class Comment(Model):
+    __verbose_name__ = '通用评论'
     key = Field(str, max_length=200, index=True)
-    num = Field(int, verbose_name='评论数量')
+    num = Field(int, verbose_name=u'评论数量')
 
 class CommentDetail(Model):
     comment = Reference('comment', collection_name='comments')

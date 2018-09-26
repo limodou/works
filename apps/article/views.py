@@ -1,5 +1,6 @@
 #coding=utf-8
 from uliweb import expose, functions
+from uliweb.utils._compat import u
 
 @expose('/article')
 class ArticleView(functions.MultiView):
@@ -218,7 +219,7 @@ class ArticleView(functions.MultiView):
                 'content_obj': obj,
                 'content': extend.content,
                 'uuid': obj.uuid,
-                'creator': unicode(obj.creator),
+                'creator': u(obj.creator),
                 'created_time': timesince(obj.created_time),
                 'category_dis': functions.get_parameter_display('article_category', obj.category),
                 'category': obj.category,

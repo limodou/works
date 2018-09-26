@@ -14,6 +14,7 @@ class ParameterView(functions.MultiView):
 
         return self._list(self.PV,
                           condition=condition,
+                          pagination=False,
                           order_by=self.PV.c.order)
 
     def add(self):
@@ -56,9 +57,33 @@ class ParameterView(functions.MultiView):
         分类返回
         :return:
         """
-        return self._list(self.P)
+        return self._list(self.P, pagination=False)
 
     def add_category(self):
         return self._add(self.P,
                          layout_class='bs3t',
                          json_result=True)
+
+    def graphql(self):
+        import graphene
+
+        class Parameter(graphene.ObjectType):
+            content_type = graphene.String()
+            name = graphene.String()
+            display = graphene.String()
+            has_color = Field(bool, verbose_name='是否有颜色')
+            created_time = graphene.String()
+            modified_time = Field(DATETIME, verbose_name='修改时间', auto_now_add=True, auto_now=True)
+
+            first_name = graphene.String()
+            last_name = graphene.String()
+            full_name = graphene.String()
+
+            def resolve_full_name(self, info):
+                return '{} {}'.format(self.first_name, self.last_name)
+
+        class Query(graphene.ObjectType):
+            parameter = graphene.String(word=graphene.String())
+
+            def resolve_reverse(self, info, word):
+                return word[::-1]

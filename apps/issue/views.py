@@ -1,6 +1,7 @@
 #coding=utf-8
-import os
+from __future__ import print_function, absolute_import, unicode_literals
 from uliweb import expose, functions
+from uliweb.utils._compat import u, string_types
 
 @expose('/issue')
 class IssueView(functions.MultiView):
@@ -390,7 +391,7 @@ class IssueView(functions.MultiView):
         if not value:
             return True, 0
         try:
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, string_types):
                 v = int(value.rstrip('%'))
             else:
                 v = int(value)
@@ -538,15 +539,15 @@ class IssueView(functions.MultiView):
                 'memo': extend.memo,
                 'status': self.D.status.get_display_value(detail.status),
                 'time': '{} / {}'.format(detail.plan_begin_date or '-', detail.plan_finish_date or '-'),
-                'responsible': unicode(detail.responsible or ''),
+                'responsible': u(detail.responsible or ''),
                 'page_num': detail.page_num,
                 'trans_num': detail.trans_num,
                 'batch_num': detail.batch_num,
                 'key': obj.uuid,
-                'creator': unicode(obj.creator),
+                'creator': u(obj.creator),
                 'created_time': timesince(obj.created_time),
-                'milestone': unicode(detail.milestone),
-                'submitter': unicode(detail.submitter),
+                'milestone': u(detail.milestone),
+                'submitter': u(detail.submitter),
                 'in_task_list': detail.in_task_list,
                 }
 
@@ -567,7 +568,7 @@ class IssueView(functions.MultiView):
 
         card['id'] = row.content_id
         card['title'] = row.get_content().title
-        card['user'] = unicode(row.responsible or u'未指派')
+        card['user'] = u(row.responsible or '未指派')
         if row.responsible:
             card['avater'] = row.responsible.get_image_url()
         else:

@@ -29,7 +29,7 @@ def process():
                         and_(C.c.id==E.c.content_id,
                             C.c.id==D.c.content_id,
                             D.c.responsible==User.c.id,
-                            D.c.milestone==3,
+                            D.c.milestone==2,
                             # D.c.status.in_(['01', '03', '05', '08', '09', '10']),
                             # D.c.in_task_list==True,
                             # C.c.category.in_(['issue', 'reqbase',
